@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "824567826400",
+    "project_id": "mtcollect-2a8fe",
+    "storage_bucket": "mtcollect-2a8fe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824567826400:android:002169421502af9bbacd85",
+        "android_client_info": {
+          "package_name": "com.collect.collectpeak"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "824567826400-jpdd7mkcskg2oh651j9rh3ajfta014ks.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.collect.collectpeak",
+            "certificate_hash": "ea52766625a24ad138920139e2fccde46caea500"
+          }
+        },
+        {
+          "client_id": "824567826400-gsqha4mn2b7q8f0ram4gu0jt1t2ldjor.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDi5WHjKrgChpBtS5wcYXiVfsVokJWYtys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "824567826400-gsqha4mn2b7q8f0ram4gu0jt1t2ldjor.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
