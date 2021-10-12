@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="vm"
+            type="com.collect.collectpeak.fragment.equipment.equipment_edit.EquipmentEditViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@color/page_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/edit_action_bar"
+            android:background="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:src="@drawable/back"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginStart="16dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+
+            <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                android:id="@+id/mt_action_bar_title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:textSize="25sp"
+                android:text="@string/equipment_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                android:id="@+id/mt_action_bar_done"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginEnd="16dp"
+                android:textSize="25sp"
+                android:text="@string/done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <ScrollView
+            app:layout_constraintTop_toBottomOf="@id/edit_action_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                    android:id="@+id/edit_title"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="@string/edit_title"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="32dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                    android:id="@+id/edit_button"
+                    android:textSize="20sp"
+                    android:textColor="@color/news_blue"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/edit"
+                    android:layout_marginTop="32dp"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginEnd="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                    android:id="@+id/edit_name"
+                    android:textSize="20sp"
+                    android:text="@{vm.equipmentNameLiveData}"
+                    app:layout_constraintTop_toBottomOf="@id/edit_title"
+                    android:layout_marginTop="4dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+
+                <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                    android:id="@+id/edit_list"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:text="@string/edit_list"
+                    app:layout_constraintTop_toBottomOf="@id/edit_name"
+                    android:layout_marginTop="48dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                    android:id="@+id/edit_list_button"
+                    android:textSize="20sp"
+                    android:textColor="@color/news_blue"
+                    android:text="@string/edit"
+                    app:layout_constraintTop_toTopOf="@id/edit_list"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginEnd="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/edit_recyler_view"
+                    android:background="@color/white"
+                    app:layout_constraintTop_toBottomOf="@id/edit_list_button"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+        </ScrollView>
+
+
+
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
+
+

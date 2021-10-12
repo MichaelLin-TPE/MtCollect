@@ -19,6 +19,18 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
     val progressBarLiveData = MutableLiveData(View.VISIBLE)
 
+    val loadingDialogLiveData = MutableLiveData<Boolean>()
+
+    val dismissLoadingDialogLiveData = MutableLiveData<Boolean>()
+
+    val finishPageLiveData = MutableLiveData<Boolean>()
+
+    val finishButtonEnable = MutableLiveData<Boolean>()
+
+    val toastLiveData = MutableLiveData<String>()
+
+    private lateinit var selectEquipmentArray : ArrayList<EquipmentData>
+
     private var targetEquipmentData = EquipmentListData()
 
     private var equipmentListTitle = TimeTool.getCurrentDate() + " ${
@@ -29,6 +41,19 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
     fun onFragmentStart() {
 
+        selectEquipmentArray = ArrayList()
+
+        loadingDialogLiveData.value = false
+
+        dismissLoadingDialogLiveData.value = false;
+
+        finishPageLiveData.value = false;
+
+        finishButtonEnable.value = false
+
+        FireStoreHandler.getInstance().getCurrentUserEquipmentData()
+
+
         equipmentRepository.getEquipmentList(object :
             FireStoreHandler.OnFireStoreCatchDataListener<EquipmentListData> {
             override fun onCatchDataSuccess(data: EquipmentListData) {
@@ -38,7 +63,6 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
                 MichaelLog.i("最終的資料：${Gson().toJson(data)}")
                 targetEquipmentData = data
                 equipmentListLiveData.value = data
-
 
             }
 
@@ -58,6 +82,33 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
         equipmentListLiveData.value = targetEquipmentData
 
+        if (selectEquipmentArray.isEmpty()){
+            selectEquipmentArray.add(data)
+            checkFinishButtonEnable()
+            MichaelLog.i("目前選取得裝備數量：${selectEquipmentArray.size}")
+            return
+        }
+        var isFoundSameData = false
+        for (equipment in selectEquipmentArray){
+            if (equipment.name == data.name){
+                selectEquipmentArray.remove(equipment)
+                isFoundSameData = true
+                break
+            }
+        }
+        if (isFoundSameData){
+            checkFinishButtonEnable()
+            MichaelLog.i("目前選取得裝備數量：${selectEquipmentArray.size}")
+            return
+        }
+        selectEquipmentArray.add(data)
+        checkFinishButtonEnable()
+        MichaelLog.i("目前選取得裝備數量：${selectEquipmentArray.size}")
+
+    }
+
+    private fun checkFinishButtonEnable() {
+        finishButtonEnable.value = !selectEquipmentArray.isEmpty()
     }
 
     private fun updateEquipmentList(list: ArrayList<EquipmentData>, data: EquipmentData) {
@@ -79,7 +130,23 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
     fun onButtonDoneClickListener() {
 
+        loadingDialogLiveData.value = true
+
         //等有使用者了這邊才會開始做
+        FireStoreHandler.getInstance().addEquipmentData(selectEquipmentArray,equipmentListTitle,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
+            override fun onCatchDataSuccess(data: Unit) {
+                dismissLoadingDialogLiveData.value = true
+                finishPageLiveData.value = true
+            }
+
+            override fun onCatchDataFail() {
+                dismissLoadingDialogLiveData.value = true;
+                toastLiveData.value = "錯誤，請重新再試一次。"
+            }
+
+        })
+
+
 
     }
 

@@ -1,6 +1,7 @@
 package com.collect.collectpeak
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.collect.collectpeak.dialog.LoadingDialog
@@ -25,6 +26,12 @@ open class MtCollectorFragment : Fragment() {
 
     fun dismissProgressDialog(){
         progressDialog.dismiss()
+    }
+
+    fun showToast(content: String){
+
+        Toast.makeText(MtCollectorApplication.getInstance().getContext(),content,Toast.LENGTH_LONG).show()
+
     }
 
 }

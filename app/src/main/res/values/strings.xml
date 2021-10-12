@@ -45,4 +45,8 @@
     <string name="enter_description">輸入個人簡介</string>
     <string name="join_time">加入時間</string>
     <string name="post_share">貼文分享</string>
+    <string name="equipment_edit">編輯裝備清單</string>
+    <string name="edit_title">名稱：</string>
+    <string name="edit">編輯</string>
+    <string name="edit_list">清單：</string>
 </resources>

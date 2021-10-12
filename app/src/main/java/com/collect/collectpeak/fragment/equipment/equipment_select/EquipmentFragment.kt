@@ -86,8 +86,7 @@ class EquipmentFragment : MtCollectorFragment() {
 
 
         dataBinding.btnBack.setOnClickListener {
-            fragmentActivity.finish()
-            Tool.startActivityOutAnim(fragmentActivity,2)
+            finishPage()
         }
 
         dataBinding.equipmentEditName.hint = TimeTool.getCurrentDate() + " ${fragmentActivity.getString(R.string.equipment_select_list)}"
@@ -110,7 +109,6 @@ class EquipmentFragment : MtCollectorFragment() {
         dataBinding.mtActionBarDone.setOnClickListener {
             viewModel.onButtonDoneClickListener()
         }
-
 
 
     }
@@ -146,6 +144,41 @@ class EquipmentFragment : MtCollectorFragment() {
 
         })
 
+        viewModel.finishButtonEnable.observe(this,{
+            dataBinding.mtActionBarDone.isEnabled = it
+        })
+
+        viewModel.loadingDialogLiveData.observe(this,{
+            if (!it){
+                return@observe
+            }
+            showProgressDialog(fragmentActivity.supportFragmentManager,"新增中")
+        })
+
+        viewModel.dismissLoadingDialogLiveData.observe(this,{
+            if (!it){
+                return@observe
+            }
+            dismissProgressDialog()
+        })
+
+        viewModel.toastLiveData.observe(this,{
+            showToast(it)
+        })
+
+        viewModel.finishPageLiveData.observe(this,{
+            if (!it){
+                return@observe
+            }
+            finishPage()
+
+        })
+
+    }
+
+    private fun finishPage(){
+        fragmentActivity.finish()
+        Tool.startActivityOutAnim(fragmentActivity,2)
     }
 
 }

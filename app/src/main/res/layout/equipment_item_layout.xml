@@ -44,6 +44,7 @@
             android:layout_height="wrap_content"/>
 
         <View
+            android:id="@+id/line"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginStart="16dp"

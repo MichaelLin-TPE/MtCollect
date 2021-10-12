@@ -1,10 +1,8 @@
 package com.collect.collectpeak.firebase
 
 import android.renderscript.ScriptIntrinsicBLAS.UNIT
-import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentData
-import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentListData
-import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentObject
-import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentOriginal
+import androidx.appcompat.widget.MenuItemHoverListener
+import com.collect.collectpeak.fragment.equipment.equipment_select.*
 import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
 import com.collect.collectpeak.log.MichaelLog
@@ -27,6 +25,8 @@ class FireStoreHandler {
 
     private val disposable = CompositeDisposable()
 
+    private var userSelectEquipmentArray = ArrayList<EquipmentUserData>()
+
     companion object {
 
         private val instance = FireStoreHandler()
@@ -38,6 +38,7 @@ class FireStoreHandler {
         const val USER_LIST = "user_list"
         const val USER_PHOTO = "user_photo"
         const val USER_BASIC_INFO = "user_basic_info"
+        const val USER_EQUIPMENT_LIST = "user_equipment_list"
 
         fun getInstance(): FireStoreHandler {
             return instance
@@ -569,6 +570,125 @@ class FireStoreHandler {
                     onFireStoreCatchDataListener.onCatchDataFail()
                 }
             }
+    }
+
+    fun addEquipmentData(
+        selectEquipmentArray: java.util.ArrayList<EquipmentData>,
+        equipmentListTitle: String,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+
+        val data = EquipmentUserData()
+
+        data.name = equipmentListTitle
+        data.selectTargetArray = selectEquipmentArray
+
+        userSelectEquipmentArray.add(data)
+
+        val json = Gson().toJson(userSelectEquipmentArray)
+
+
+        val map = HashMap<String,String>()
+
+        map["json"] = json
+
+        AuthHandler.getCurrentUser()?.uid?.let{
+            firestore.collection(USER_EQUIPMENT_LIST)
+                .document(it)
+                .set(map, SetOptions.merge())
+                .addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
+                    }else{
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                    }
+                }
+        }
+
+    }
+
+    fun getCurrentUserEquipmentData() {
+        userSelectEquipmentArray = ArrayList()
+        AuthHandler.getCurrentUser()?.uid?.let {
+            firestore.collection(USER_EQUIPMENT_LIST)
+                .document(it)
+                .get()
+                .addOnCompleteListener {task ->
+
+                    if (!task.isSuccessful && task.result == null){
+
+                        MichaelLog.i("沒有裝備資料 result is null")
+
+                        return@addOnCompleteListener
+                    }
+                    val snapshot = task.result
+
+                    if (snapshot == null || snapshot.data == null){
+
+                        MichaelLog.i("沒有裝備資料 snapshot is null")
+
+                        return@addOnCompleteListener
+                    }
+
+
+                    val json = snapshot.data?.get("json") as String
+
+                    val equipmentList = Gson().fromJson<ArrayList<EquipmentUserData>>(
+                        json,
+                        object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
+                    )
+                    if (equipmentList.isNullOrEmpty()){
+
+                        MichaelLog.i("沒有裝備資料 data is null")
+
+                        return@addOnCompleteListener
+                    }
+                    userSelectEquipmentArray.addAll(equipmentList)
+
+                }
+        }
+    }
+
+    fun getUserEquipmentData(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<EquipmentUserData>>) {
+        AuthHandler.getCurrentUser()?.uid?.let {
+
+            firestore.collection(USER_EQUIPMENT_LIST)
+                .document(it)
+                .get()
+                .addOnCompleteListener {task ->
+                    if (!task.isSuccessful && task.result == null){
+
+                        MichaelLog.i("沒有裝備資料 result is null")
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        return@addOnCompleteListener
+                    }
+                    val snapshot = task.result
+
+                    if (snapshot == null || snapshot.data == null){
+
+                        MichaelLog.i("沒有裝備資料 snapshot is null")
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        return@addOnCompleteListener
+                    }
+
+
+                    val json = snapshot.data?.get("json") as String
+
+                    val equipmentList = Gson().fromJson<ArrayList<EquipmentUserData>>(
+                        json,
+                        object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
+                    )
+                    if (equipmentList.isNullOrEmpty()){
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        MichaelLog.i("沒有裝備資料 data is null")
+
+                        return@addOnCompleteListener
+                    }
+
+                    onFireStoreCatchDataListener.onCatchDataSuccess(equipmentList)
+                }
+
+        }
     }
 
 
