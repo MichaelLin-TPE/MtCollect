@@ -49,4 +49,7 @@
     <string name="edit_title">名稱：</string>
     <string name="edit">編輯</string>
     <string name="edit_list">清單：</string>
+    <string name="remove">刪除</string>
+    <string name="cancel">取消</string>
+    <string name="confirm_delete">要刪除已被勾選的項目？</string>
 </resources>

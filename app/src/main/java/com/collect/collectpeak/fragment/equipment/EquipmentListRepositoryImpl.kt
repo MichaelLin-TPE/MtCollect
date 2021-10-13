@@ -18,4 +18,19 @@ class EquipmentListRepositoryImpl : EquipmentListRepository {
         })
     }
 
+    override fun deleteUserEquipmentData(
+        userSelectDeleteData: ArrayList<EquipmentUserData>,
+        onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<Unit>
+    ) {
+        FireStoreHandler.getInstance().deleteUserEquipmentData(userSelectDeleteData,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
+            override fun onCatchDataSuccess(data: Unit) {
+                onFireStoreCatchDataListener.onCatchDataSuccess(data)
+            }
+
+            override fun onCatchDataFail() {
+                onFireStoreCatchDataListener.onCatchDataFail()
+            }
+        })
+    }
+
 }

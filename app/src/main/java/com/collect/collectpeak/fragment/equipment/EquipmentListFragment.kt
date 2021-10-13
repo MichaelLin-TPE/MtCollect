@@ -2,11 +2,7 @@ package com.collect.collectpeak.fragment.equipment
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Paint
 import android.os.Bundle
-import android.text.Html
-import android.text.SpannableString
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,9 +16,9 @@ import com.collect.collectpeak.activity.EquipmentActivity
 import com.collect.collectpeak.activity.EquipmentActivity.Companion.EDIT
 import com.collect.collectpeak.activity.EquipmentActivity.Companion.SELECT
 import com.collect.collectpeak.databinding.FragmentEquipmentListBinding
+import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentUserData
 import com.collect.collectpeak.tool.Tool
-import kotlin.concurrent.fixedRateTimer
 
 
 class EquipmentListFragment : MtCollectorFragment() {
@@ -30,6 +26,8 @@ class EquipmentListFragment : MtCollectorFragment() {
     private lateinit var dataBinding: FragmentEquipmentListBinding
 
     private lateinit var fragmentActivity: FragmentActivity
+
+    private val adapter = EquipmentAdapter()
 
     private val viewModel : EquipmentListViewModel by activityViewModels {
         val repository = EquipmentListRepositoryImpl()
@@ -43,6 +41,8 @@ class EquipmentListFragment : MtCollectorFragment() {
 
 
     companion object {
+        const val NORMAL = 0
+        const val DELETE = 1
         @JvmStatic
         fun newInstance() = EquipmentListFragment().apply {
             arguments = Bundle().apply {
@@ -53,9 +53,7 @@ class EquipmentListFragment : MtCollectorFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
 
-        }
     }
 
     override fun onCreateView(
@@ -84,6 +82,15 @@ class EquipmentListFragment : MtCollectorFragment() {
         dataBinding.equipmentRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
 
 
+        dataBinding.mtActionBarDelete.setOnClickListener {
+            viewModel.onDeleteConfirmClickListener()
+        }
+
+
+        dataBinding.mtActionBarDone.setOnClickListener {
+            viewModel.onDoneButtonClickListener()
+        }
+
     }
 
     private fun intentToEquipmentSelectPage(){
@@ -95,13 +102,15 @@ class EquipmentListFragment : MtCollectorFragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.goToEditPageLiveData.value = EquipmentUserData()
-        viewModel.goToEditPageLiveData.removeObservers(this)
+
+        viewModel.showDeleteListView.value =false
+        viewModel.updateDeleteView.value = ArrayList()
+        viewModel.showDeleteConfirmDialog.value = false
     }
 
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         viewModel.onFragmentStart()
         handleObserver()
     }
@@ -117,35 +126,73 @@ class EquipmentListFragment : MtCollectorFragment() {
 
         viewModel.updateEquipmentListLiveData.observe(this,{ data->
 
-            val adapter = EquipmentAdapter()
-
+            adapter.setType(NORMAL)
             adapter.setDataArray(data)
 
             dataBinding.equipmentRecyclerView.adapter = adapter
 
             adapter.setOnEquipmentItemClickListener(object : EquipmentAdapter.OnEquipmentItemClickListener{
                 override fun onClick(data: EquipmentUserData) {
-                    viewModel.onEquipmentItemClickListener(data)
+                    goToEditPage(data)
+                }
+
+                override fun onLongPress() {
+                    viewModel.onEquipmentLongPressListener()
                 }
 
             })
 
         })
+        viewModel.showDeleteListView.observe(this,{
+            if (!it){
+                return@observe
+            }
+            adapter.setType(DELETE)
+            adapter.notifyDataSetChanged()
+            adapter.setOnEquipmentDeleteClickListener(object : EquipmentAdapter.OnEquipmentDeleteClickListener{
+                override fun onDelete(data: EquipmentUserData) {
+                    viewModel.onDeleteEquipmentClickListener(data)
+                }
 
-        viewModel.goToEditPageLiveData.observe(this,{
+            })
+        })
 
-            if (it.name.isEmpty()){
+        viewModel.updateDeleteView.observe(this,{
+
+            if (it.isEmpty()){
+                return@observe
+            }
+            adapter.setType(DELETE)
+            adapter.setDataArray(it)
+            adapter.notifyDataSetChanged()
+        })
+
+        viewModel.showDeleteConfirmDialog.observe(this,{
+
+            if (!it){
                 return@observe
             }
 
-            val intent = Intent(fragmentActivity,EquipmentActivity::class.java)
-            intent.putExtra("type",EDIT)
-            intent.putExtra("data",it)
-            fragmentActivity.startActivity(intent)
-            Tool.startActivityInAnim(fragmentActivity,2)
+            showConfirmDialog(fragmentActivity.supportFragmentManager,fragmentActivity.getString(R.string.confirm_delete),object : ConfirmDialog.OnConfirmDialogClickListener{
+                override fun onConfirm() {
+                    viewModel.onConfirmDeleteClickListener()
+                }
+
+                override fun onCancel() {
+
+                }
+
+            })
         })
 
+    }
 
+    private fun goToEditPage(data: EquipmentUserData) {
+        val intent = Intent(fragmentActivity,EquipmentActivity::class.java)
+        intent.putExtra("type",EDIT)
+        intent.putExtra("data",data)
+        fragmentActivity.startActivity(intent)
+        Tool.startActivityInAnim(fragmentActivity,2)
     }
 
 

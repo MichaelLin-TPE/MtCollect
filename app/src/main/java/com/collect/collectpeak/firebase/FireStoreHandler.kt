@@ -9,6 +9,7 @@ import com.collect.collectpeak.log.MichaelLog
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.auth.User
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
@@ -650,8 +651,59 @@ class FireStoreHandler {
     }
 
     fun getUserEquipmentData(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<EquipmentUserData>>) {
-        AuthHandler.getCurrentUser()?.uid?.let {
 
+        AuthHandler.getCurrentUser()?.uid?.let{
+
+            val documentReference = firestore.collection(USER_EQUIPMENT_LIST).document(it)
+
+            documentReference.addSnapshotListener { value, error ->
+
+                if (error != null) {
+
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    MichaelLog.i("錯誤 無法取的使用者資料")
+                    return@addSnapshotListener
+                }
+
+                if (value != null && value.exists()) {
+
+                    val json = value.get("json") as String
+
+                    if (json.isEmpty()) {
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        return@addSnapshotListener
+                    }
+
+                    val equipmentList = Gson().fromJson<ArrayList<EquipmentUserData>>(
+                        json,
+                        object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
+                    )
+                    if (equipmentList.isNullOrEmpty()){
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        MichaelLog.i("沒有裝備資料 data is null")
+
+                        return@addSnapshotListener
+                    }
+
+                    onFireStoreCatchDataListener.onCatchDataSuccess(equipmentList)
+
+                }
+
+
+            }
+
+
+
+
+        }
+    }
+
+    fun deleteUserEquipmentData(
+        userSelectDeleteData: java.util.ArrayList<EquipmentUserData>,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+
+        AuthHandler.getCurrentUser()?.uid?.let {
             firestore.collection(USER_EQUIPMENT_LIST)
                 .document(it)
                 .get()
@@ -679,16 +731,55 @@ class FireStoreHandler {
                         object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
                     )
                     if (equipmentList.isNullOrEmpty()){
-                        onFireStoreCatchDataListener.onCatchDataFail()
+
                         MichaelLog.i("沒有裝備資料 data is null")
+                        onFireStoreCatchDataListener.onCatchDataFail()
 
                         return@addOnCompleteListener
                     }
+                    val iterator = equipmentList.iterator()
 
-                    onFireStoreCatchDataListener.onCatchDataSuccess(equipmentList)
+                    while (iterator.hasNext()){
+
+                        val data = iterator.next()
+
+                        userSelectDeleteData.forEach {
+                            if (data.equipmentID == it.equipmentID){
+                                iterator.remove()
+                                return@forEach
+                            }
+                        }
+                    }
+                    saveUserEquipmentData(equipmentList,onFireStoreCatchDataListener)
+
                 }
-
         }
+
+
+
+
+
+    }
+
+    private fun saveUserEquipmentData(
+        equipmentList: java.util.ArrayList<EquipmentUserData>,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+
+        val json = Gson().toJson(equipmentList)
+
+        val map = HashMap<String,String>()
+
+        map["json"] = json
+
+        AuthHandler.getCurrentUser()?.uid?.let{
+
+            firestore.collection(USER_EQUIPMENT_LIST)
+                .document(it)
+                .set(map, SetOptions.merge())
+        }
+        onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
+
     }
 
 

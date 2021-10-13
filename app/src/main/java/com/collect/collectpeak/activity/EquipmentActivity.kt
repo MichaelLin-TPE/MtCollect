@@ -26,7 +26,7 @@ class EquipmentActivity : AppCompatActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         val bundle = intent.extras
 
-        val type = bundle?.getInt("type",0)
+        val type : Int? = bundle?.getInt("type",0)
 
         if (type == SELECT){
             transaction.replace(R.id.container,EquipmentFragment.newInstance()).commit()

@@ -5,4 +5,10 @@ import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentUser
 
 interface EquipmentListRepository {
     fun getCurrentUserEquipment(onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>)
+    fun deleteUserEquipmentData(
+        userSelectDeleteData: ArrayList<EquipmentUserData>,
+        onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<Unit>
+    )
+
+
 }

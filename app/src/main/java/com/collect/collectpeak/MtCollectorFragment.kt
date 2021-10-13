@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.LoadingDialog
 
 
@@ -22,6 +23,25 @@ open class MtCollectorFragment : Fragment() {
     fun showProgressDialog(fragmentManager: FragmentManager, content: String){
         progressDialog = LoadingDialog.newInstance(content)
         progressDialog.show(fragmentManager, "progressDialog")
+    }
+
+    fun showConfirmDialog(fragmentManager: FragmentManager,content: String,onConfirmDialogClickListener: ConfirmDialog.OnConfirmDialogClickListener){
+
+        val dialog = ConfirmDialog.newInstance(content)
+
+        dialog.show(fragmentManager,"dialog")
+
+        dialog.setOnConfirmDialogClickListener(object : ConfirmDialog.OnConfirmDialogClickListener{
+            override fun onConfirm() {
+                onConfirmDialogClickListener.onConfirm()
+            }
+
+            override fun onCancel() {
+                onConfirmDialogClickListener.onCancel()
+            }
+
+        })
+
     }
 
     fun dismissProgressDialog(){
