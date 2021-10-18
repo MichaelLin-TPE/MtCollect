@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.activity.MemberProfileActivity
+import com.collect.collectpeak.activity.SettingActivity
 import com.collect.collectpeak.databinding.FragmentMemberBinding
 import com.collect.collectpeak.dialog.LoadingDialog
 import com.collect.collectpeak.tool.GoogleLoginTool
@@ -96,6 +97,17 @@ class MemberFragment : MtCollectorFragment() {
 
         dataBinding.memberRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
 
+
+        dataBinding.actionSetting.setOnClickListener {
+            intentToSettingPage()
+        }
+
+    }
+
+    private fun intentToSettingPage() {
+        val intent = Intent(fragmentActivity,SettingActivity::class.java)
+        fragmentActivity.startActivity(intent)
+        Tool.startActivityInAnim(fragmentActivity,2)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

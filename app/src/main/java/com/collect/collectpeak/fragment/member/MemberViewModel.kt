@@ -1,5 +1,6 @@
 package com.collect.collectpeak.fragment.member
 
+import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,12 +24,15 @@ class MemberViewModel(private val repository: MemberRepository) : ViewModel() {
 
     val updateMemberViewLiveData = MutableLiveData<Boolean>()
 
+    val showSettingIconLiveData = MutableLiveData<Int>()
+
     private val targetUser = AuthHandler.getCurrentUser()
 
     fun onFragmentStart() {
 
         defaultLoginViewLiveData.value = !AuthHandler.isLogin()
         memberInfoViewLiveData.value = AuthHandler.isLogin()
+        showSettingIconLiveData.value = if (AuthHandler.isLogin()) View.VISIBLE else View.GONE
 
     }
 

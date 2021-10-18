@@ -53,6 +53,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginEnd="16dp"
+                android:enabled="@{vm.deleteButtonEnable}"
                 android:visibility="@{vm.showDeleteIconLiveData}"
                 android:textSize="25sp"
                 android:text="@string/remove"

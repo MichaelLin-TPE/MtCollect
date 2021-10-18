@@ -146,6 +146,16 @@ class GoogleLoginTool {
             )
         }
 
+        fun signOut() {
+
+            googleSignInClient.revokeAccess().addOnCompleteListener {
+                MichaelLog.i("Google revokeAccess")
+            }
+            googleSignInClient.signOut().addOnCompleteListener {
+                MichaelLog.i("Google signOut")
+            }
+        }
+
 
     }
 

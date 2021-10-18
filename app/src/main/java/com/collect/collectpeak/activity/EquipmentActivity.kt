@@ -10,40 +10,43 @@ import com.collect.collectpeak.fragment.equipment.equipment_edit.EquipmentEditFr
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentFragment
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentUserData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.FragmentUtil
+import com.collect.collectpeak.tool.StatusBarTool
 
 class EquipmentActivity : AppCompatActivity() {
 
     companion object{
         const val SELECT = 0
         const val EDIT = 1
-
+        const val EDIT_LIST = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_equipment)
 
-        val transaction = supportFragmentManager.beginTransaction()
+
         val bundle = intent.extras
 
         val type : Int? = bundle?.getInt("type",0)
 
         if (type == SELECT){
-            transaction.replace(R.id.container,EquipmentFragment.newInstance()).commit()
+
+            FragmentUtil.replace(R.id.container,supportFragmentManager,EquipmentFragment.newInstance(SELECT),true,EquipmentFragment.javaClass.simpleName,1)
+
         }else{
 
             val data = bundle?.getParcelable<EquipmentUserData>("data")
 
             MichaelLog.i("有收到資料：${data?.name}")
 
-            data?.let { EquipmentEditFragment.newInstance(it) }?.let { transaction.replace(R.id.container, it).commit() }
+            data?.let { EquipmentEditFragment.newInstance(it) }?.let {
+                FragmentUtil.replace(R.id.container,supportFragmentManager,it,true,EquipmentEditFragment.javaClass.simpleName,1)
+            }
         }
 
-        window.statusBarColor =  Color.TRANSPARENT
+        StatusBarTool.setStatusBarSameColorAsActionBar(window,findViewById(R.id.container))
 
-        val view = findViewById<FrameLayout>(R.id.container)
-
-        WindowInsetsControllerCompat(window,view).isAppearanceLightStatusBars = true
     }
 
 

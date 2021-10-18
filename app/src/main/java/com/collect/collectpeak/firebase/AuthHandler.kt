@@ -1,10 +1,8 @@
 package com.collect.collectpeak.firebase
 
+import com.collect.collectpeak.tool.GoogleLoginTool
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.*
 
 class AuthHandler {
 
@@ -23,6 +21,12 @@ class AuthHandler {
         fun getCurrentUser(): FirebaseUser? = auth.currentUser
 
         fun isLogin(): Boolean = getCurrentUser() != null
+
+
+        fun logout() {
+            GoogleLoginTool.signOut()
+            auth.signOut()
+        }
 
     }
 

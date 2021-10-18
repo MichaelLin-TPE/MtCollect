@@ -4,19 +4,20 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.EquipmentActivity.Companion.SELECT
 import com.collect.collectpeak.databinding.FragmentEquipmentBinding
+import com.collect.collectpeak.fragment.equipment.equipment_edit.EquipmentEditFragment
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentNewAdapter.Companion.TITLE
+import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.HeaderItemDecoration
 import com.collect.collectpeak.tool.TimeTool
 import com.collect.collectpeak.tool.Tool
@@ -26,6 +27,8 @@ class EquipmentFragment : MtCollectorFragment() {
     private lateinit var fragmentActivity: FragmentActivity
 
     private lateinit var adapter: EquipmentNewAdapter
+
+    private var type = 0
 
     private val viewModel: EquipmentViewModel by activityViewModels {
         val repository = EquipmentRepositoryImpl()
@@ -42,10 +45,10 @@ class EquipmentFragment : MtCollectorFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(type: Int) =
             EquipmentFragment().apply {
                 arguments = Bundle().apply {
-
+                    this.putInt("type",type)
                 }
             }
     }
@@ -53,7 +56,7 @@ class EquipmentFragment : MtCollectorFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-
+            type = it.getInt("type",SELECT)
         }
     }
 
@@ -126,7 +129,7 @@ class EquipmentFragment : MtCollectorFragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onFragmentStart()
+        viewModel.onFragmentStart(type)
 
         observerHandler()
     }
@@ -177,8 +180,17 @@ class EquipmentFragment : MtCollectorFragment() {
     }
 
     private fun finishPage(){
-        fragmentActivity.finish()
-        Tool.startActivityOutAnim(fragmentActivity,2)
+
+        if(type == SELECT){
+            fragmentActivity.finish()
+            Tool.startActivityOutAnim(fragmentActivity,2)
+            return
+        }
+
+        FragmentUtil.popBackStackTo(fragmentActivity.supportFragmentManager,EquipmentEditFragment.javaClass.simpleName)
+
+
+
     }
 
 }

@@ -1,7 +1,5 @@
 package com.collect.collectpeak.firebase
 
-import android.renderscript.ScriptIntrinsicBLAS.UNIT
-import androidx.appcompat.widget.MenuItemHoverListener
 import com.collect.collectpeak.fragment.equipment.equipment_select.*
 import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
@@ -9,7 +7,6 @@ import com.collect.collectpeak.log.MichaelLog
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.auth.User
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Observable
@@ -18,7 +15,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.lang.reflect.Member
 
 class FireStoreHandler {
 
@@ -703,6 +699,78 @@ class FireStoreHandler {
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
     ) {
 
+        getUserEquipmentList(object : OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>{
+            override fun onCatchDataSuccess(data: ArrayList<EquipmentUserData>) {
+                val iterator = data.iterator()
+
+                while (iterator.hasNext()){
+
+                    val data = iterator.next()
+
+                    userSelectDeleteData.forEach {
+                        if (data.equipmentID == it.equipmentID){
+                            iterator.remove()
+                            return@forEach
+                        }
+                    }
+                }
+                saveUserEquipmentData(data,onFireStoreCatchDataListener)
+            }
+
+            override fun onCatchDataFail() {
+                onFireStoreCatchDataListener.onCatchDataFail()
+            }
+        })
+
+    }
+
+    private fun saveUserEquipmentData(
+        equipmentList: java.util.ArrayList<EquipmentUserData>,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+
+        val json = Gson().toJson(equipmentList)
+
+        val map = HashMap<String,String>()
+
+        map["json"] = json
+
+        AuthHandler.getCurrentUser()?.uid?.let{
+
+            firestore.collection(USER_EQUIPMENT_LIST)
+                .document(it)
+                .set(map, SetOptions.merge())
+        }
+        onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
+
+    }
+
+    fun saveSingleUserEquipmentData(
+        targetUserData: EquipmentUserData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        getUserEquipmentList(object : OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>{
+            override fun onCatchDataSuccess(data: ArrayList<EquipmentUserData>) {
+                val dataArray = ArrayList<EquipmentUserData>(data)
+                dataArray.forEach { equipment ->
+                    if(equipment.equipmentID == targetUserData.equipmentID){
+                        equipment.name = targetUserData.name
+                        equipment.selectTargetArray = targetUserData.selectTargetArray
+                        return@forEach
+                    }
+                }
+                saveUserEquipmentData(dataArray,onFireStoreCatchDataListener)
+            }
+
+            override fun onCatchDataFail() {
+                onFireStoreCatchDataListener.onCatchDataFail()
+            }
+
+        })
+    }
+
+    private fun getUserEquipmentList(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>){
+
         AuthHandler.getCurrentUser()?.uid?.let {
             firestore.collection(USER_EQUIPMENT_LIST)
                 .document(it)
@@ -737,48 +805,11 @@ class FireStoreHandler {
 
                         return@addOnCompleteListener
                     }
-                    val iterator = equipmentList.iterator()
-
-                    while (iterator.hasNext()){
-
-                        val data = iterator.next()
-
-                        userSelectDeleteData.forEach {
-                            if (data.equipmentID == it.equipmentID){
-                                iterator.remove()
-                                return@forEach
-                            }
-                        }
-                    }
-                    saveUserEquipmentData(equipmentList,onFireStoreCatchDataListener)
-
+                    onFireStoreCatchDataListener.onCatchDataSuccess(equipmentList)
                 }
         }
 
 
-
-
-
-    }
-
-    private fun saveUserEquipmentData(
-        equipmentList: java.util.ArrayList<EquipmentUserData>,
-        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
-    ) {
-
-        val json = Gson().toJson(equipmentList)
-
-        val map = HashMap<String,String>()
-
-        map["json"] = json
-
-        AuthHandler.getCurrentUser()?.uid?.let{
-
-            firestore.collection(USER_EQUIPMENT_LIST)
-                .document(it)
-                .set(map, SetOptions.merge())
-        }
-        onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
 
     }
 

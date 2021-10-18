@@ -20,10 +20,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CollectPeak">
-        <activity android:name=".activity.MemberProfileActivity"
-            android:theme="@style/Theme.MyTranslucent"/>
-        <activity android:name=".activity.EquipmentActivity"
-            android:theme="@style/Theme.MyTranslucent"/>
+        <activity android:name=".activity.SettingActivity"></activity>
+        <activity
+            android:name=".activity.MemberProfileActivity"
+            android:theme="@style/Theme.MyTranslucent" />
+        <activity
+            android:name=".activity.EquipmentActivity"
+            android:theme="@style/Theme.MyTranslucent" />
         <activity android:name=".main_frame.MainFrameActivity" />
         <activity android:name=".activity.LaunchActivity">
             <intent-filter>

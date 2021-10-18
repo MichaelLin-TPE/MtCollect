@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.collect.collectpeak.dialog.ConfirmDialog
+import com.collect.collectpeak.dialog.EditContentDialog
 import com.collect.collectpeak.dialog.LoadingDialog
 
 
@@ -43,6 +44,21 @@ open class MtCollectorFragment : Fragment() {
         })
 
     }
+    fun showEditContentDialog(fragmentManager: FragmentManager,content: String,onEditContentDialogClickListener: EditContentDialog.OnEditContentDialogClickListener){
+        val dialog = EditContentDialog.newInstance(content)
+        dialog.show(fragmentManager,"dialog")
+        dialog.setOnEditContentDialogClickListener(object : EditContentDialog.OnEditContentDialogClickListener{
+            override fun onConfirm(content: String) {
+                onEditContentDialogClickListener.onConfirm(content)
+            }
+
+            override fun onCancel() {
+               onEditContentDialogClickListener.onCancel()
+            }
+
+        })
+    }
+
 
     fun dismissProgressDialog(){
         progressDialog.dismiss()

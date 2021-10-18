@@ -6,8 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.EquipmentActivity.Companion.EDIT_LIST
+import com.collect.collectpeak.activity.EquipmentActivity.Companion.SELECT
 import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.TempDataHandler
 import com.collect.collectpeak.tool.TimeTool
 import com.google.gson.Gson
 import java.util.ArrayList
@@ -29,6 +32,8 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
     val toastLiveData = MutableLiveData<String>()
 
+    val showEditNameLiveData = MutableLiveData<Int>()
+
     private lateinit var selectEquipmentArray : ArrayList<EquipmentData>
 
     private var targetEquipmentData = EquipmentListData()
@@ -39,7 +44,11 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
         )
     }"
 
-    fun onFragmentStart() {
+    private var type = 0
+
+    fun onFragmentStart(type: Int) {
+
+        this.type = type
 
         selectEquipmentArray = ArrayList()
 
@@ -53,6 +62,7 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
         FireStoreHandler.getInstance().getCurrentUserEquipmentData()
 
+        showEditNameLiveData.value = if (type == SELECT) View.VISIBLE else View.GONE
 
         equipmentRepository.getEquipmentList(object :
             FireStoreHandler.OnFireStoreCatchDataListener<EquipmentListData> {
@@ -61,8 +71,30 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
                 progressBarLiveData.value = View.GONE
 
                 MichaelLog.i("最終的資料：${Gson().toJson(data)}")
+
+                if (type == SELECT){
+                    targetEquipmentData = data
+
+                    equipmentListLiveData.value = data
+                    return
+                }
+
+                val userEquipmentList = TempDataHandler.getUserEquipmentList()
+
+                selectEquipmentArray.clear()
+
+                data.equipmentList.forEach { equipment ->
+
+                    startToFindSameData(equipment,userEquipmentList)
+
+                }
+
+                checkFinishButtonEnable()
+
                 targetEquipmentData = data
+
                 equipmentListLiveData.value = data
+
 
             }
 
@@ -71,6 +103,45 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
             }
 
         })
+    }
+
+    private fun startToFindSameData(
+        equipment: ArrayList<EquipmentData>,
+        userEquipmentList: ArrayList<EquipmentData>
+    ) {
+        equipment.forEach { data ->
+
+            startToCheckData(data,userEquipmentList)
+
+
+        }
+    }
+
+    private fun startToCheckData(data: EquipmentData, userEquipmentList: ArrayList<EquipmentData>) {
+        userEquipmentList.forEach {
+            if (data.name == it.name){
+                saveUserSelectData(data)
+                data.isCheck = true
+                return@forEach
+            }
+        }
+    }
+
+    private fun saveUserSelectData(data: EquipmentData) {
+        if (selectEquipmentArray.isEmpty()){
+            selectEquipmentArray.add(data)
+            return
+        }
+        var isFoundSameData = false
+        selectEquipmentArray.forEach {
+            if (it.name == data.name){
+                isFoundSameData = true
+                return@forEach
+            }
+        }
+        if (!isFoundSameData){
+            selectEquipmentArray.add(data)
+        }
     }
 
     fun onEquipmentItemCheckListener(data: EquipmentData) {
@@ -108,7 +179,7 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
     }
 
     private fun checkFinishButtonEnable() {
-        finishButtonEnable.value = !selectEquipmentArray.isEmpty()
+        finishButtonEnable.value = selectEquipmentArray.isNotEmpty()
     }
 
     private fun updateEquipmentList(list: ArrayList<EquipmentData>, data: EquipmentData) {
@@ -129,6 +200,16 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
     }
 
     fun onButtonDoneClickListener() {
+
+
+        if (type == EDIT_LIST){
+
+            TempDataHandler.setUserEquipmentList(selectEquipmentArray)
+            finishPageLiveData.value = true
+
+            return
+        }
+
 
         loadingDialogLiveData.value = true
 

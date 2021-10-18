@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentUserData
 import com.collect.collectpeak.log.MichaelLog
@@ -38,6 +39,17 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
         showDeleteIconLiveData.value = View.GONE
         showDeleteListView.value = false
         updateDeleteView.value = ArrayList()
+
+        if (!AuthHandler.isLogin()){
+
+            MichaelLog.i("尚未登入 不做拿取資料的動作")
+
+
+
+            return
+        }
+
+
 
         equipmentListRepository.getCurrentUserEquipment(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>{
             override fun onCatchDataSuccess(data: ArrayList<EquipmentUserData>) {

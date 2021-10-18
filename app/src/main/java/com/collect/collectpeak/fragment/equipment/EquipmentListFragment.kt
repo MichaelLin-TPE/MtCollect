@@ -17,6 +17,7 @@ import com.collect.collectpeak.activity.EquipmentActivity.Companion.EDIT
 import com.collect.collectpeak.activity.EquipmentActivity.Companion.SELECT
 import com.collect.collectpeak.databinding.FragmentEquipmentListBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
+import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentUserData
 import com.collect.collectpeak.tool.Tool
 
@@ -76,6 +77,7 @@ class EquipmentListFragment : MtCollectorFragment() {
         }
 
         dataBinding.equipmentAddIcon.setOnClickListener {
+
             intentToEquipmentSelectPage()
         }
 
@@ -94,6 +96,16 @@ class EquipmentListFragment : MtCollectorFragment() {
     }
 
     private fun intentToEquipmentSelectPage(){
+
+        if (!AuthHandler.isLogin()){
+
+            showToast(fragmentActivity.getString(R.string.title_please_login_first))
+
+            return
+        }
+
+
+
         val intent = Intent(fragmentActivity,EquipmentActivity::class.java)
         intent.putExtra("type",SELECT)
         fragmentActivity.startActivity(intent)
