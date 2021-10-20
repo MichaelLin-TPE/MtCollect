@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import com.collect.collectpeak.R
+import com.collect.collectpeak.log.MichaelLog
 
 class FragmentUtil {
 
@@ -24,6 +25,7 @@ class FragmentUtil {
         ) {
 
             val ft = fragmentManager.beginTransaction()
+            MichaelLog.i("近來的名字：${fragment.javaClass.simpleName}")
             val f = fragmentManager.findFragmentByTag(fragment.javaClass.simpleName)
 
             when (anim) {
@@ -39,6 +41,7 @@ class FragmentUtil {
             }
 
             if (f != null){
+                MichaelLog.i("有刪除該 : ${f.tag}")
                 ft.remove(f)
             }
             ft.replace(container,fragment)

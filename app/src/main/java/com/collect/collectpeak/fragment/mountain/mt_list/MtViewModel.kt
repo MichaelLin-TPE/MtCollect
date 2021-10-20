@@ -1,4 +1,4 @@
-package com.collect.collectpeak.fragment.mountain
+package com.collect.collectpeak.fragment.mountain.mt_list
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

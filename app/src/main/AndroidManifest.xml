@@ -20,7 +20,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CollectPeak">
-        <activity android:name=".activity.SettingActivity"></activity>
+        <activity
+            android:name=".activity.PeakActivity"
+            android:label="@string/title_activity_peak"
+            android:theme="@style/Theme.CollectPeak.NoActionBar"></activity>
+        <activity android:name=".activity.SettingActivity" />
         <activity
             android:name=".activity.MemberProfileActivity"
             android:theme="@style/Theme.MyTranslucent" />

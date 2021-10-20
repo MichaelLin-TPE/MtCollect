@@ -56,4 +56,32 @@
     <string name="title_please_login_first">請先登入後再使用。</string>
     <string name="setting">設定</string>
     <string name="logout">登出</string>
+    <string name="title_peak_time">選擇登頂時間</string>
+    <string name="next">下一步</string>
+    <string name="title_activity_peak">PeakActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_sun">星期日</string>
+    <string name="title_mon">星期一</string>
+    <string name="title_tue">星期二</string>
+    <string name="title_wed">星期三</string>
+    <string name="title_thur">星期四</string>
+    <string name="title_fri">星期五</string>
+    <string name="title_sat">星期六</string>
+    <string name="Jan">一月</string>
+    <string name="title_sun_short">日</string>
+    <string name="title_mon_short">一</string>
+    <string name="title_tue_short">二</string>
+    <string name="title_wed_short">三</string>
+    <string name="title_thur_short">四</string>
+    <string name="title_fri_short">五</string>
+    <string name="title_sat_short">六</string>
+    <string name="title_ignore">忽略</string>
+    <string name="title_select_photo">選擇照片</string>
+    <string name="title_press_here_to_select_photo">點選這裡選擇圖片</string>
 </resources>

@@ -1,8 +1,9 @@
 package com.collect.collectpeak.firebase
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class MountainData {
+class MountainData : Serializable{
 
     @SerializedName("sid")
     var sid = 0

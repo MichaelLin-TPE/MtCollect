@@ -1,24 +1,23 @@
-package com.collect.collectpeak.fragment.mountain
+package com.collect.collectpeak.fragment.mountain.mt_list
 
 import android.content.Context
-import android.graphics.Color
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.PeakActivity
 import com.collect.collectpeak.databinding.FragmentMtBinding
 import com.collect.collectpeak.dialog.LevelDialog
-import com.collect.collectpeak.fragment.mountain.mt_list.MtListAdapter
+import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.log.MichaelLog
-import com.collect.collectpeak.tool.StatusBarUtil
+import com.collect.collectpeak.tool.Tool
 
 class MtFragment : Fragment() {
 
@@ -76,6 +75,15 @@ class MtFragment : Fragment() {
             dataBinding.mtRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
             dataBinding.mtRecyclerView.adapter = adapter
 
+            adapter.setOnMountainFootPrintClickListener(object : MtListViewModel.OnMountainFootPrintClickListener{
+                override fun onMtFootPrintClick(data: MountainData) {
+                    MichaelLog.i("點擊 FootPrint : ${data.name}")
+
+                    intentToPeakTimePage(data)
+
+                }
+            })
+
         })
 
         viewModel.levelDialogLiveData.observe(this, {
@@ -103,6 +111,16 @@ class MtFragment : Fragment() {
         })
 
 
+    }
+
+    private fun intentToPeakTimePage(data: MountainData) {
+        val intent = Intent(fragmentActivity,PeakActivity::class.java)
+
+        intent.putExtra("data",data)
+
+        fragmentActivity.startActivity(intent)
+
+        Tool.startActivityInAnim(fragmentActivity,2)
     }
 
     override fun onPause() {

@@ -71,5 +71,6 @@
     <dimen name="error_dialog_size">250dp</dimen>
     <dimen name="error_title_size">20sp</dimen>
     <dimen name="error_dialog_btn_height">30dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
 </resources>

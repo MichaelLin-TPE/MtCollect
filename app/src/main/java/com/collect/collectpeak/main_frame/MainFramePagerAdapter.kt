@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import com.collect.collectpeak.fragment.equipment.EquipmentListFragment
 import com.collect.collectpeak.fragment.home.HomeFragment
 import com.collect.collectpeak.fragment.member.MemberFragment
-import com.collect.collectpeak.fragment.mountain.MtFragment
+import com.collect.collectpeak.fragment.mountain.mt_list.MtFragment
 import com.collect.collectpeak.fragment.share.ShareFragment
 
 class MainFramePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {

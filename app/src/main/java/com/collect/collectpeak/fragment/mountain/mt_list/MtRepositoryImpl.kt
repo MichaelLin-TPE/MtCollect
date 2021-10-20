@@ -1,11 +1,11 @@
-package com.collect.collectpeak.fragment.mountain
+package com.collect.collectpeak.fragment.mountain.mt_list
 
 import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.MountainData
 
-class MtRepositoryImpl : MtRepository{
+class MtRepositoryImpl : MtRepository {
     override fun getMountainList(onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<MountainData>>) {
 
         FireStoreHandler.getInstance().getMountainList(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<MountainData>>{

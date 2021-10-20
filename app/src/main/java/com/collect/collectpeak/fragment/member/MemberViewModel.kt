@@ -56,6 +56,8 @@ class MemberViewModel(private val repository: MemberRepository) : ViewModel() {
 
         defaultLoginViewLiveData.value = !AuthHandler.isLogin()
 
+        showSettingIconLiveData.value = if (AuthHandler.isLogin()) View.VISIBLE else View.GONE
+
         memberInfoViewLiveData.value = true
 
 
