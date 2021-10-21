@@ -18,7 +18,6 @@ import com.collect.collectpeak.fragment.mountain.peak_photo.PhotoFragment
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.FragmentUtil.Companion.ANIM_LEFT_RIGHT
-import com.collect.collectpeak.tool.FragmentUtil.Companion.ANIM_RIGHT_LEFT
 import com.collect.collectpeak.tool.Tool
 
 
@@ -56,7 +55,7 @@ class PeakTimeFragment : MtCollectorFragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onFragmentStart()
+        viewModel.onFragmentStart(mountainData)
 
         observerHandle()
     }
@@ -107,7 +106,7 @@ class PeakTimeFragment : MtCollectorFragment() {
 
 
         viewModel.goToSelectPhotoPageLiveData.observe(this,{
-            if (it.month.isEmpty()){
+            if (it.mtName.isEmpty()){
                 return@observe
             }
             MichaelLog.i("前進選擇照片頁面")
@@ -122,7 +121,7 @@ class PeakTimeFragment : MtCollectorFragment() {
         super.onPause()
         viewModel.showYeaListDialogLiveData.value = ""
         viewModel.yearLiveData.value = "2021"
-        viewModel.goToSelectPhotoPageLiveData.value = CalendarData()
+        viewModel.goToSelectPhotoPageLiveData.value = MtPeakData()
         viewModel.goToSelectPhotoPageLiveData.removeObservers(this)
         viewModel.showYeaListDialogLiveData.removeObservers(this)
         viewModel.onPause()

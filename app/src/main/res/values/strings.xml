@@ -84,4 +84,11 @@
     <string name="title_ignore">忽略</string>
     <string name="title_select_photo">選擇照片</string>
     <string name="title_press_here_to_select_photo">點選這裡選擇圖片</string>
+    <string name="title_select_again">重新選擇</string>
+    <string name="title_preivew">預覽</string>
+    <string name="title_not_select_photo_yet">尚未選擇照片</string>
+    <string name="title_mt_name">山名：</string>
+    <string name="title_mt_level">等級：</string>
+    <string name="title_mt_time">登頂時間：</string>
+    <string name="title_description">描述些過程吧....</string>
 </resources>

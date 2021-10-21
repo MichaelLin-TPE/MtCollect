@@ -3,6 +3,7 @@ package com.collect.collectpeak.fragment.mountain.peak_time
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.CalendarHandler
 import java.text.SimpleDateFormat
@@ -20,7 +21,7 @@ class PeakTimeViewModel : ViewModel() {
 
     val enableNextButtonLiveData = MutableLiveData(false)
 
-    val goToSelectPhotoPageLiveData = MutableLiveData<CalendarData>()
+    val goToSelectPhotoPageLiveData = MutableLiveData<MtPeakData>()
 
     val yearLiveData = MutableLiveData(
         SimpleDateFormat(
@@ -29,11 +30,15 @@ class PeakTimeViewModel : ViewModel() {
         ).format(Date(System.currentTimeMillis()))
     )
 
+    private lateinit var mountainData: MountainData
+
     private var targetCalendarArray = ArrayList<CalendarObject>()
 
     private var userSelectCalendarData = CalendarData()
 
-    fun onFragmentStart() {
+    fun onFragmentStart(mountainData: MountainData) {
+
+        this.mountainData = mountainData;
 
         CalendarHandler.instance.getYearCalendar(getCurrentYear(),
             object : CalendarHandler.OnCreateCalendarListener {
@@ -105,7 +110,18 @@ class PeakTimeViewModel : ViewModel() {
     }
 
     fun onNextButtonClickListener() {
-        goToSelectPhotoPageLiveData.value = userSelectCalendarData
+
+        val mtPeakData = MtPeakData()
+
+        mtPeakData.mtName = mountainData.name
+
+        mtPeakData.time = userSelectCalendarData.timeStamp
+
+        mtPeakData.level = mountainData.difficulty
+
+        MichaelLog.i("目前選擇的是：${mtPeakData.mtName} 時間：${SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date(mtPeakData.time))}")
+
+        goToSelectPhotoPageLiveData.value = mtPeakData
     }
 
     fun onPause() {

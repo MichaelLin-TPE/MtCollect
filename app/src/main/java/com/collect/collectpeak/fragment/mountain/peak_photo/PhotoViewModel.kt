@@ -8,6 +8,7 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.collect.collectpeak.fragment.mountain.peak_time.MtPeakData
 import com.luck.picture.lib.entity.LocalMedia
 import java.io.File
 import java.lang.Exception
@@ -18,13 +19,22 @@ class PhotoViewModel : ViewModel() {
 
     val showViewPager = MutableLiveData(View.INVISIBLE)
 
+    val showReSelectButtonLiveData = MutableLiveData(View.GONE)
+
     private val bitmapArray = ArrayList<Bitmap>()
 
     val viewPagerLiveData = MutableLiveData<ArrayList<Bitmap>>()
 
+    val goToPreviewPageLiveData = MutableLiveData<MtPeakData>()
+
+    private lateinit var mtPeakData: MtPeakData
+
+    private var uploadCount = 0
+
     fun onCatchPhotoListener(it: List<LocalMedia>, contentResolver: ContentResolver) {
         showDefaultViewLiveData.value = View.GONE
         showViewPager.value = View.VISIBLE
+        bitmapArray.clear()
         it.forEach { data->
 
             val file = File(data.cutPath)
@@ -37,10 +47,27 @@ class PhotoViewModel : ViewModel() {
             }
 
         }
-
+        showReSelectButtonLiveData.value = View.VISIBLE
         viewPagerLiveData.value = bitmapArray
 
 
+    }
+
+    fun onNextButtonClickListener() {
+
+        mtPeakData.photoArray = bitmapArray
+
+        goToPreviewPageLiveData.value = mtPeakData
+
+    }
+
+    fun onFragmentStart(targetMtPeakData: MtPeakData) {
+        this.mtPeakData = targetMtPeakData
+    }
+
+    fun onIgnoreButtonClickListener() {
+        mtPeakData.photoArray = ArrayList()
+        goToPreviewPageLiveData.value = mtPeakData
     }
 
 

@@ -4,8 +4,9 @@
     <data>
         <variable
             name="vm"
-            type="com.collect.collectpeak.fragment.mountain.peak_photo.PhotoViewModel" />
+            type="com.collect.collectpeak.fragment.mountain.peak_preview.PreviewViewModel" />
     </data>
+
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -13,7 +14,7 @@
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:background="@color/page_background"
-        tools:context=".fragment.mountain.peak_photo.PhotoFragment">
+        tools:context=".fragment.mountain.peak_preview.PreviewFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mt_action_bar"
@@ -40,28 +41,27 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 android:textSize="25sp"
-                android:text="@string/title_select_photo"
+                android:text="@string/title_preivew"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <com.collect.collectpeak.custom_widget.CollectPeakTextView
-                android:id="@+id/mt_action_bar_ignore"
+                android:id="@+id/mt_action_bar_done"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginEnd="16dp"
                 android:textSize="20sp"
-                android:text="@string/title_ignore"
+                android:text="@string/done"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
         <androidx.viewpager.widget.ViewPager
-            android:id="@+id/photo_view_pager"
-            android:visibility="@{vm.showViewPager}"
+            android:id="@+id/preview_view_pager"
             app:layout_constraintTop_toBottomOf="@id/mt_action_bar"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -71,62 +71,68 @@
             android:layout_width="match_parent"
             android:layout_height="450dp" />
 
-
-        <View
-            android:id="@+id/photo_select_view"
-            android:visibility="@{vm.showDefaultViewLiveData}"
-            android:background="@drawable/select_photo_shape"
-            app:layout_constraintTop_toTopOf="@id/photo_view_pager"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="450dp"/>
-
         <com.collect.collectpeak.custom_widget.CollectPeakTextView
-            android:id="@+id/photo_info"
-            android:textColor="@color/news_blue"
-            android:textSize="30sp"
-            android:visibility="@{vm.showDefaultViewLiveData}"
-            android:text="@string/title_press_here_to_select_photo"
-            app:layout_constraintTop_toTopOf="@id/photo_select_view"
-            app:layout_constraintBottom_toBottomOf="@id/photo_select_view"
-            app:layout_constraintLeft_toLeftOf="@id/photo_select_view"
-            app:layout_constraintRight_toRightOf="@id/photo_select_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-
-
-        <com.collect.collectpeak.custom_widget.CollectPeakTextView
-            android:id="@+id/photo_repeat"
-            android:text="@string/title_select_again"
-            android:textSize="20sp"
-            android:visibility="@{vm.showReSelectButtonLiveData}"
-            app:layout_constraintTop_toBottomOf="@id/photo_view_pager"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-
-
-        <com.collect.collectpeak.custom_widget.CollectPeakButton
-            android:id="@+id/photo_btn_next"
-            android:text="@string/next"
+            android:id="@+id/preview_no_photo"
             android:textSize="25sp"
-            app:layout_goneMarginTop="16dp"
-            android:background="@drawable/custom_button_shape"
-            app:layout_constraintTop_toBottomOf="@id/photo_repeat"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_width="match_parent"
+            android:visibility="@{vm.showNoPhotoInfoLiveData}"
+            android:text="@string/title_not_select_photo_yet"
+            app:layout_constraintTop_toTopOf="@id/preview_view_pager"
+            app:layout_constraintLeft_toLeftOf="@id/preview_view_pager"
+            app:layout_constraintRight_toRightOf="@id/preview_view_pager"
+            app:layout_constraintBottom_toBottomOf="@id/preview_view_pager"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <com.collect.collectpeak.custom_widget.CollectPeakTextView
+            android:id="@+id/preview_mt_name"
+            android:textSize="20sp"
+            android:text="@string/title_mt_name"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/preview_view_pager"
+            app:layout_constraintLeft_toLeftOf="@id/preview_view_pager"
+            android:layout_marginTop="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.collect.collectpeak.custom_widget.CollectPeakTextView
+            android:id="@+id/preview_mt_level"
+            android:textSize="20sp"
+            android:text="@string/title_mt_level"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/preview_view_pager"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.collect.collectpeak.custom_widget.CollectPeakTextView
+            android:id="@+id/preview_mt_time"
+            android:textSize="20sp"
+            android:text="@string/title_mt_time"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/preview_mt_name"
+            app:layout_constraintLeft_toLeftOf="@id/preview_mt_name"
+            android:layout_marginTop="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <com.collect.collectpeak.custom_widget.CollectPeakEditTextView
+            android:id="@+id/preview_desc"
+            app:layout_constraintTop_toBottomOf="@id/preview_mt_time"
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="@id/preview_mt_name"
+            app:layout_constraintRight_toRightOf="@id/preview_mt_level"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/weather_spinner_shape"
+            android:hint="@string/title_description"
+            android:textColor="@color/black"
+            android:gravity="top|start"
+            android:padding="10dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"/>
+
 
 
 

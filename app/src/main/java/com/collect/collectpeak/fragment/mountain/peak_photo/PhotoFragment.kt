@@ -1,6 +1,7 @@
 package com.collect.collectpeak.fragment.mountain.peak_photo
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +12,11 @@ import androidx.fragment.app.activityViewModels
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentPhotoBinding
-import com.collect.collectpeak.fragment.mountain.peak_time.CalendarData
+import com.collect.collectpeak.fragment.mountain.peak_preview.PreviewFragment
+import com.collect.collectpeak.fragment.mountain.peak_time.MtPeakData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.FragmentUtil
+import com.collect.collectpeak.tool.FragmentUtil.Companion.ANIM_LEFT_RIGHT
 import com.collect.collectpeak.tool.GlideEngine
 import com.luck.picture.lib.PictureSelector
 import com.luck.picture.lib.config.PictureMimeType
@@ -24,7 +28,7 @@ class PhotoFragment : MtCollectorFragment() {
 
     private lateinit var fragmentActivity: FragmentActivity
 
-    private lateinit var targetCalendarData: CalendarData
+    private lateinit var targetMtPeakData: MtPeakData
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -34,7 +38,7 @@ class PhotoFragment : MtCollectorFragment() {
     companion object {
 
         @JvmStatic
-        fun newInstance(data : CalendarData) =
+        fun newInstance(data : MtPeakData) =
             PhotoFragment().apply {
                 arguments = Bundle().apply {
                     this.putParcelable("data",data)
@@ -50,9 +54,10 @@ class PhotoFragment : MtCollectorFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            targetCalendarData = it.getParcelable<CalendarData>("data") as CalendarData
+            targetMtPeakData = it.getParcelable<MtPeakData>("data") as MtPeakData
         }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,13 +78,29 @@ class PhotoFragment : MtCollectorFragment() {
         MichaelLog.i("PhotoFragment destroy")
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.goToPreviewPageLiveData.value = MtPeakData()
+        viewModel.goToPreviewPageLiveData.removeObservers(this)
+    }
+
     override fun onStart() {
         super.onStart()
+
+        viewModel.onFragmentStart(targetMtPeakData)
 
         viewModel.viewPagerLiveData.observe(this,{
             val adapter = PhotoAdapter()
             adapter.setData(it,fragmentActivity)
             dataBinding.photoViewPager.adapter = adapter
+        })
+
+        viewModel.goToPreviewPageLiveData.observe(this,{
+            if (it.mtName.isEmpty()){
+                return@observe
+            }
+            FragmentUtil.replace(R.id.container,fragmentActivity.supportFragmentManager,PreviewFragment.newInstance(it),true,PreviewFragment.javaClass.simpleName,ANIM_LEFT_RIGHT)
+
         })
     }
 
@@ -92,21 +113,35 @@ class PhotoFragment : MtCollectorFragment() {
         }
 
         dataBinding.photoSelectView.setOnClickListener {
-            PictureSelector.create(fragmentActivity)
-                .openGallery(PictureMimeType.ofImage())
-                .loadImageEngine(GlideEngine.createGlideEngine())
-                .maxSelectNum(3)
-                .compress(true)
-                .enableCrop(true)
-                .hideBottomControls(false)
-                .showCropFrame(false)
-                .freeStyleCropEnabled(true)
-                .forResult {
-                    viewModel.onCatchPhotoListener(it,fragmentActivity.contentResolver)
-                }
+            showSelectPhotoView()
         }
 
+        dataBinding.photoRepeat.setOnClickListener {
+            showSelectPhotoView()
+        }
 
+        dataBinding.photoBtnNext.setOnClickListener {
+            viewModel.onNextButtonClickListener()
+        }
+        dataBinding.mtActionBarIgnore.setOnClickListener {
+            viewModel.onIgnoreButtonClickListener()
+        }
+
+    }
+
+    private fun showSelectPhotoView(){
+        PictureSelector.create(fragmentActivity)
+            .openGallery(PictureMimeType.ofImage())
+            .loadImageEngine(GlideEngine.createGlideEngine())
+            .maxSelectNum(3)
+            .compress(true)
+            .enableCrop(true)
+            .hideBottomControls(false)
+            .showCropFrame(false)
+            .freeStyleCropEnabled(true)
+            .forResult {
+                viewModel.onCatchPhotoListener(it,fragmentActivity.contentResolver)
+            }
     }
 
 
