@@ -3,6 +3,7 @@ package com.collect.collectpeak.fragment.member
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,8 +13,12 @@ import androidx.viewpager.widget.ViewPager
 import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.collect.collectpeak.firebase.FireStoreHandler
+import com.collect.collectpeak.fragment.member.page_fragment.PostFragment
+import com.collect.collectpeak.fragment.member.page_fragment.goal.GoalFragment
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.ImageLoaderHandler
+import com.collect.collectpeak.tool.Tool
 import com.google.android.material.tabs.TabLayout
 import java.lang.reflect.Member
 
@@ -48,9 +53,11 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         }
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.member_page_type_layout, parent, false)
+            .inflate(R.layout.member_type_page_layout, parent, false)
 
-        return MemberTypePageViewHolder(view)
+
+        return MemberPageViewHolder(view)
+//        return MemberTypePageViewHolder(view)
 
     }
 
@@ -61,6 +68,10 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             holder.showView()
             holder.setOnMemberInfoClickListener(onMemberInfoClickListener)
             return
+        }
+        if (holder is MemberPageViewHolder){
+            holder.showView(fragmentManager)
+
         }
 
         if (holder is MemberTypePageViewHolder) {
@@ -170,6 +181,55 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     }
 
+    class MemberPageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+
+        private val postView : ConstraintLayout = itemView.findViewById(R.id.post_view)
+
+        private val goalView : ConstraintLayout = itemView.findViewById(R.id.goal_view)
+
+        private val ivPost : ImageView = itemView.findViewById(R.id.post_icon)
+
+        private val ivGoal : ImageView = itemView.findViewById(R.id.goal_icon)
+
+        private val postLine : View = itemView.findViewById(R.id.post_line)
+
+        private val goalLine : View = itemView.findViewById(R.id.goal_line)
+
+        private val root : ConstraintLayout = itemView.findViewById(R.id.member_page_root)
+
+        fun showView(fragmentManager: FragmentManager) {
+
+
+
+            val transaction = fragmentManager.beginTransaction()
+
+            transaction.replace(R.id.member_container,PostFragment.newInstance())
+            transaction.commit()
+
+            postView.setOnClickListener{
+                val postTransaction = fragmentManager.beginTransaction()
+                ivPost.setImageResource(R.drawable.post_pressed)
+                ivGoal.setImageResource(R.drawable.goal_not_press)
+                postLine.visibility = View.VISIBLE
+                goalLine.visibility = View.GONE
+                postTransaction.replace(R.id.member_container,PostFragment.newInstance())
+                postTransaction.commit()
+            }
+            goalView.setOnClickListener {
+                val goalTransaction = fragmentManager.beginTransaction()
+                ivPost.setImageResource(R.drawable.post_not_press)
+                ivGoal.setImageResource(R.drawable.goal_pressed)
+                postLine.visibility = View.GONE
+                goalLine.visibility = View.VISIBLE
+                goalTransaction.replace(R.id.member_container,GoalFragment.newInstance())
+                goalTransaction.commit()
+            }
+
+        }
+
+    }
+
+
     class MemberTypePageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val viewPager = itemView.findViewById<ViewPager>(R.id.member_type_view_pager)
@@ -177,17 +237,6 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val tabLayout = itemView.findViewById<TabLayout>(R.id.member_type_tab)
 
         fun showView(fragmentManager: FragmentManager) {
-
-            tabLayout.addOnTabSelectedListener(
-                TabLayout.ViewPagerOnTabSelectedListener(
-                    viewPager
-                )
-            )
-            viewPager.addOnPageChangeListener(
-                TabLayout.TabLayoutOnPageChangeListener(
-                    tabLayout
-                )
-            )
 
             val tabNotPressArray = ArrayList<Int>()
             tabNotPressArray.add(R.drawable.post_not_press)
@@ -201,6 +250,17 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             setUpTab(tabNotPressArray)
 
             setUpViewPager(fragmentManager)
+
+            tabLayout.addOnTabSelectedListener(
+                TabLayout.ViewPagerOnTabSelectedListener(
+                    viewPager
+                )
+            )
+            viewPager.addOnPageChangeListener(
+                TabLayout.TabLayoutOnPageChangeListener(
+                    tabLayout
+                )
+            )
 
             val firstTab = tabLayout.getTabAt(0)
             var ivTabIcon = firstTab?.customView?.findViewById<ImageView>(R.id.member_tab_icon)

@@ -1,7 +1,10 @@
 package com.collect.collectpeak.tool
 
 import android.app.Activity
+import android.content.res.Resources
+import android.util.DisplayMetrics
 import android.widget.TextView
+import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.google.android.gms.common.SignInButton
 
@@ -44,6 +47,16 @@ class Tool {
 
             }
 
+        }
+
+        fun getScreenWidth() : Int {
+
+            return Resources.getSystem().displayMetrics.widthPixels
+
+        }
+
+        fun getScreenHeight(): Int {
+            return Resources.getSystem().displayMetrics.heightPixels
         }
 
 

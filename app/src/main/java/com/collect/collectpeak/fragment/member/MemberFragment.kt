@@ -257,8 +257,10 @@ class MemberFragment : MtCollectorFragment() {
 
     private fun setUpMemberView() {
         dataBinding.memberRecyclerView.visibility = View.VISIBLE
+
         adapter = MemberAdapter()
-        adapter.setFragmentManager(fragmentActivity.supportFragmentManager)
+
+        adapter.setFragmentManager(childFragmentManager)
 
         dataBinding.memberRecyclerView.adapter = adapter
 
