@@ -2,6 +2,8 @@ package com.collect.collectpeak.fragment.mountain.peak_preview
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,8 @@ import com.collect.collectpeak.databinding.FragmentPreviewBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.fragment.mountain.peak_photo.PhotoAdapter
 import com.collect.collectpeak.fragment.mountain.peak_time.MtPeakData
+import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.Tool
 
 
 class PreviewFragment : MtCollectorFragment() {
@@ -36,6 +40,7 @@ class PreviewFragment : MtCollectorFragment() {
     }
 
     companion object {
+
         @JvmStatic
         fun newInstance(mtPeakData: MtPeakData) =
             PreviewFragment().apply {
@@ -98,16 +103,47 @@ class PreviewFragment : MtCollectorFragment() {
             }
             showConfirmDialog(fragmentActivity.supportFragmentManager,it,object : ConfirmDialog.OnConfirmDialogClickListener{
                 override fun onConfirm() {
-
+                    MichaelLog.i("點擊確定")
                     viewModel.onConfirmShareClickListener()
 
                 }
 
                 override fun onCancel() {
+                    MichaelLog.i("點擊取消")
                     viewModel.onCancelShareClickListener()
                 }
 
             })
+        })
+
+        viewModel.showProgressDialogLiveData.observe(this,{
+            if (it.isEmpty()){
+                return@observe
+            }
+            showProgressDialog(fragmentActivity.supportFragmentManager,it)
+
+        })
+
+        viewModel.dismissProgressDialogLiveData.observe(this,{
+            if (!it){
+                return@observe
+            }
+            dismissProgressDialog()
+        })
+
+        viewModel.showToastLiveData.observe(this,{
+            if (it.isEmpty()){
+                return@observe
+            }
+            showToast(it)
+        })
+
+        viewModel.finishPageLiveData.observe(this,{
+            if (!it){
+                return@observe
+            }
+            fragmentActivity.finish()
+            Tool.startActivityOutAnim(fragmentActivity,2)
         })
     }
 
@@ -118,7 +154,12 @@ class PreviewFragment : MtCollectorFragment() {
         viewModel.mtLevelLiveData.value = ""
         viewModel.mtPhotoArrayLiveData.value = ArrayList()
         viewModel.showConfirmDialogLiveData.value = ""
+        viewModel.showProgressDialogLiveData.value = ""
+        viewModel.dismissProgressDialogLiveData.value = false
+        viewModel.showToastLiveData.value = ""
+        viewModel.finishPageLiveData.value = false
 
+        viewModel.onFragmentPause()
     }
 
     override fun onCreateView(

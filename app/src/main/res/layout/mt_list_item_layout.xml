@@ -75,15 +75,16 @@
             app:layout_constraintBottom_toTopOf="@id/mt_item_time"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginEnd="60dp"
-            android:src="@drawable/footprints_not_presse"
+            android:src="@{vm.mtFootPrintIconLiveData ? @drawable/footprints_pressed : @drawable/footprints_not_presse}"
             app:layout_constraintVertical_chainStyle="packed"
             android:layout_width="30dp"
             android:layout_height="30dp"/>
 
         <com.collect.collectpeak.custom_widget.CollectPeakTextView
             android:id="@+id/mt_item_time"
-            android:textSize="14sp"
+            android:textSize="18sp"
             tools:text="2021/06/05"
+            android:text="@{vm.mtTimeLiveData}"
             android:textColor="@color/news_blue"
             app:layout_constraintLeft_toLeftOf="@id/mt_item_foot_print"
             app:layout_constraintRight_toRightOf="@id/mt_item_foot_print"

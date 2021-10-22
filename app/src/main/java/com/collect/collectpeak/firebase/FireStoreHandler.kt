@@ -3,6 +3,8 @@ package com.collect.collectpeak.firebase
 import com.collect.collectpeak.fragment.equipment.equipment_select.*
 import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
+import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.fragment.share.ShareData
 import com.collect.collectpeak.log.MichaelLog
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,14 +17,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.function.Consumer
 
 class FireStoreHandler {
 
     private lateinit var firestore: FirebaseFirestore
 
-    private val disposable = CompositeDisposable()
-
     private var userSelectEquipmentArray = ArrayList<EquipmentUserData>()
+
+    private lateinit var onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+
+    private val disposable = CompositeDisposable()
 
     companion object {
 
@@ -36,7 +41,8 @@ class FireStoreHandler {
         const val USER_PHOTO = "user_photo"
         const val USER_BASIC_INFO = "user_basic_info"
         const val USER_EQUIPMENT_LIST = "user_equipment_list"
-
+        const val USER_SUMMIT_DATA = "user_summit_data";
+        const val USER_POST_DATA = "user_post_data"
         fun getInstance(): FireStoreHandler {
             return instance
         }
@@ -90,19 +96,19 @@ class FireStoreHandler {
     }
 
     private fun checkUserExist(
-        user:FirebaseUser,
+        user: FirebaseUser,
         userList: java.util.ArrayList<MemberData>,
         onCheckUserExistResultListener: OnCheckUserExistResultListener
     ) {
 
         var isFoundUser = false
         for (data in userList) {
-            if (data.userId == user.uid){
+            if (data.userId == user.uid) {
                 isFoundUser = true
                 break
             }
         }
-        if (isFoundUser){
+        if (isFoundUser) {
             onCheckUserExistResultListener.onUserExist()
             return
         }
@@ -116,7 +122,6 @@ class FireStoreHandler {
         userList.add(memberData)
         addUser(Gson().toJson(userList))
         onCheckUserExistResultListener.onNeedToAddNewProfile()
-
 
 
     }
@@ -169,12 +174,12 @@ class FireStoreHandler {
             }
 
 
-
     }
-    private fun addFirstBasicData(){
+
+    private fun addFirstBasicData() {
         val memberBasicData = MemberBasicData()
         val json = Gson().toJson(memberBasicData)
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = json
 
         AuthHandler.getCurrentUser()?.uid?.let {
@@ -372,7 +377,7 @@ class FireStoreHandler {
             firestore.collection(USER_PHOTO)
                 .document(it)
                 .get()
-                .addOnCompleteListener {task ->
+                .addOnCompleteListener { task ->
                     if (!task.isSuccessful || task.result == null) {
 
                         MichaelLog.i("取得照片網址失敗")
@@ -421,24 +426,22 @@ class FireStoreHandler {
 
                     val json = snapshot.data?.get("json") as String
 
-                    val basicData = Gson().fromJson(json,MemberBasicData::class.java)
+                    val basicData = Gson().fromJson(json, MemberBasicData::class.java)
 
                     onFireStoreCatchDataListener.onCatchDataSuccess(basicData)
                 }
         }
 
 
-
-
     }
 
-    fun getUserProfile(onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<MemberData>) {
+    fun getUserProfile(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<MemberData>) {
 
         firestore.collection(USER)
             .document(USER_LIST)
             .get()
             .addOnCompleteListener { task ->
-                if (!task.isSuccessful && task.result == null){
+                if (!task.isSuccessful && task.result == null) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -446,7 +449,7 @@ class FireStoreHandler {
                 }
                 val snapshot = task.result
 
-                if (snapshot == null || snapshot.data == null){
+                if (snapshot == null || snapshot.data == null) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -461,7 +464,7 @@ class FireStoreHandler {
                     object : TypeToken<ArrayList<MemberData>>() {}.type
                 )
 
-                if (userList.isNullOrEmpty()){
+                if (userList.isNullOrEmpty()) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -470,15 +473,15 @@ class FireStoreHandler {
 
                 var memberData = MemberData()
 
-                AuthHandler.getCurrentUser()?.uid?.let{ uid ->
+                AuthHandler.getCurrentUser()?.uid?.let { uid ->
                     userList.forEach {
-                        if (uid == it.userId){
+                        if (uid == it.userId) {
                             memberData = it
                             return@forEach
                         }
                     }
                 }
-                if (memberData.email.isEmpty()){
+                if (memberData.email.isEmpty()) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -487,9 +490,7 @@ class FireStoreHandler {
                 onFireStoreCatchDataListener.onCatchDataSuccess(memberData)
 
 
-
             }
-
 
 
     }
@@ -502,7 +503,7 @@ class FireStoreHandler {
             .document(USER_LIST)
             .get()
             .addOnCompleteListener { task ->
-                if (!task.isSuccessful && task.result == null){
+                if (!task.isSuccessful && task.result == null) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -510,7 +511,7 @@ class FireStoreHandler {
                 }
                 val snapshot = task.result
 
-                if (snapshot == null || snapshot.data == null){
+                if (snapshot == null || snapshot.data == null) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -525,16 +526,16 @@ class FireStoreHandler {
                     object : TypeToken<ArrayList<MemberData>>() {}.type
                 )
 
-                if (userList.isNullOrEmpty()){
+                if (userList.isNullOrEmpty()) {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
                     return@addOnCompleteListener
                 }
 
-                AuthHandler.getCurrentUser()?.uid?.let{ uid ->
+                AuthHandler.getCurrentUser()?.uid?.let { uid ->
                     userList.forEach {
-                        if (uid == it.userId){
+                        if (uid == it.userId) {
                             it.description = memberData.description
                             it.name = memberData.name
                             return@forEach
@@ -543,7 +544,7 @@ class FireStoreHandler {
                 }
 
                 val userJson = Gson().toJson(userList)
-                saveUserListData(userJson,onFireStoreCatchDataListener)
+                saveUserListData(userJson, onFireStoreCatchDataListener)
 
             }
     }
@@ -553,7 +554,7 @@ class FireStoreHandler {
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
     ) {
 
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
 
         map["user_json"] = userJson
 
@@ -561,9 +562,9 @@ class FireStoreHandler {
             .document(USER_LIST)
             .set(map, SetOptions.merge())
             .addOnCompleteListener {
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
-                }else{
+                } else {
                     onFireStoreCatchDataListener.onCatchDataFail()
                 }
             }
@@ -585,18 +586,18 @@ class FireStoreHandler {
         val json = Gson().toJson(userSelectEquipmentArray)
 
 
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
 
         map["json"] = json
 
-        AuthHandler.getCurrentUser()?.uid?.let{
+        AuthHandler.getCurrentUser()?.uid?.let {
             firestore.collection(USER_EQUIPMENT_LIST)
                 .document(it)
                 .set(map, SetOptions.merge())
                 .addOnCompleteListener { task ->
-                    if(task.isSuccessful){
+                    if (task.isSuccessful) {
                         onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
-                    }else{
+                    } else {
                         onFireStoreCatchDataListener.onCatchDataFail()
                     }
                 }
@@ -610,9 +611,9 @@ class FireStoreHandler {
             firestore.collection(USER_EQUIPMENT_LIST)
                 .document(it)
                 .get()
-                .addOnCompleteListener {task ->
+                .addOnCompleteListener { task ->
 
-                    if (!task.isSuccessful && task.result == null){
+                    if (!task.isSuccessful && task.result == null) {
 
                         MichaelLog.i("沒有裝備資料 result is null")
 
@@ -620,7 +621,7 @@ class FireStoreHandler {
                     }
                     val snapshot = task.result
 
-                    if (snapshot == null || snapshot.data == null){
+                    if (snapshot == null || snapshot.data == null) {
 
                         MichaelLog.i("沒有裝備資料 snapshot is null")
 
@@ -634,7 +635,7 @@ class FireStoreHandler {
                         json,
                         object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
                     )
-                    if (equipmentList.isNullOrEmpty()){
+                    if (equipmentList.isNullOrEmpty()) {
 
                         MichaelLog.i("沒有裝備資料 data is null")
 
@@ -648,7 +649,7 @@ class FireStoreHandler {
 
     fun getUserEquipmentData(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<EquipmentUserData>>) {
 
-        AuthHandler.getCurrentUser()?.uid?.let{
+        AuthHandler.getCurrentUser()?.uid?.let {
 
             val documentReference = firestore.collection(USER_EQUIPMENT_LIST).document(it)
 
@@ -674,7 +675,7 @@ class FireStoreHandler {
                         json,
                         object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
                     )
-                    if (equipmentList.isNullOrEmpty()){
+                    if (equipmentList.isNullOrEmpty()) {
                         onFireStoreCatchDataListener.onCatchDataFail()
                         MichaelLog.i("沒有裝備資料 data is null")
 
@@ -689,8 +690,6 @@ class FireStoreHandler {
             }
 
 
-
-
         }
     }
 
@@ -699,22 +698,22 @@ class FireStoreHandler {
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
     ) {
 
-        getUserEquipmentList(object : OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>{
+        getUserEquipmentList(object : OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>> {
             override fun onCatchDataSuccess(data: ArrayList<EquipmentUserData>) {
                 val iterator = data.iterator()
 
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
 
                     val data = iterator.next()
 
                     userSelectDeleteData.forEach {
-                        if (data.equipmentID == it.equipmentID){
+                        if (data.equipmentID == it.equipmentID) {
                             iterator.remove()
                             return@forEach
                         }
                     }
                 }
-                saveUserEquipmentData(data,onFireStoreCatchDataListener)
+                saveUserEquipmentData(data, onFireStoreCatchDataListener)
             }
 
             override fun onCatchDataFail() {
@@ -731,11 +730,11 @@ class FireStoreHandler {
 
         val json = Gson().toJson(equipmentList)
 
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
 
         map["json"] = json
 
-        AuthHandler.getCurrentUser()?.uid?.let{
+        AuthHandler.getCurrentUser()?.uid?.let {
 
             firestore.collection(USER_EQUIPMENT_LIST)
                 .document(it)
@@ -749,17 +748,17 @@ class FireStoreHandler {
         targetUserData: EquipmentUserData,
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
     ) {
-        getUserEquipmentList(object : OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>{
+        getUserEquipmentList(object : OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>> {
             override fun onCatchDataSuccess(data: ArrayList<EquipmentUserData>) {
                 val dataArray = ArrayList<EquipmentUserData>(data)
                 dataArray.forEach { equipment ->
-                    if(equipment.equipmentID == targetUserData.equipmentID){
+                    if (equipment.equipmentID == targetUserData.equipmentID) {
                         equipment.name = targetUserData.name
                         equipment.selectTargetArray = targetUserData.selectTargetArray
                         return@forEach
                     }
                 }
-                saveUserEquipmentData(dataArray,onFireStoreCatchDataListener)
+                saveUserEquipmentData(dataArray, onFireStoreCatchDataListener)
             }
 
             override fun onCatchDataFail() {
@@ -769,14 +768,14 @@ class FireStoreHandler {
         })
     }
 
-    private fun getUserEquipmentList(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>){
+    private fun getUserEquipmentList(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>) {
 
         AuthHandler.getCurrentUser()?.uid?.let {
             firestore.collection(USER_EQUIPMENT_LIST)
                 .document(it)
                 .get()
-                .addOnCompleteListener {task ->
-                    if (!task.isSuccessful && task.result == null){
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful && task.result == null) {
 
                         MichaelLog.i("沒有裝備資料 result is null")
                         onFireStoreCatchDataListener.onCatchDataFail()
@@ -784,7 +783,7 @@ class FireStoreHandler {
                     }
                     val snapshot = task.result
 
-                    if (snapshot == null || snapshot.data == null){
+                    if (snapshot == null || snapshot.data == null) {
 
                         MichaelLog.i("沒有裝備資料 snapshot is null")
                         onFireStoreCatchDataListener.onCatchDataFail()
@@ -798,7 +797,7 @@ class FireStoreHandler {
                         json,
                         object : TypeToken<ArrayList<EquipmentUserData>>() {}.type
                     )
-                    if (equipmentList.isNullOrEmpty()){
+                    if (equipmentList.isNullOrEmpty()) {
 
                         MichaelLog.i("沒有裝備資料 data is null")
                         onFireStoreCatchDataListener.onCatchDataFail()
@@ -810,7 +809,267 @@ class FireStoreHandler {
         }
 
 
+    }
 
+    fun setUserSummitData(
+        data: SummitData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        AuthHandler.getCurrentUser()?.uid?.let {
+
+            firestore.collection(USER_SUMMIT_DATA)
+                .document(it)
+                .get()
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful && task.result == null) {
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        return@addOnCompleteListener
+                    }
+                    val snapshot = task.result
+
+                    if (snapshot == null || snapshot.data == null) {
+
+                        MichaelLog.i("沒有登頂資料 snapshot is null 建立新的一筆新的")
+
+                        saveFirstSummitData(data, onFireStoreCatchDataListener)
+
+                        return@addOnCompleteListener
+                    }
+
+                    val json = snapshot.data?.get("json") as String
+
+                    val summitArray = Gson().fromJson<ArrayList<SummitData>>(
+                        json,
+                        object : TypeToken<ArrayList<SummitData>>() {}.type
+                    )
+                    if (summitArray.isNullOrEmpty()) {
+
+                        MichaelLog.i("沒有裝備資料 data is null")
+                        saveFirstSummitData(data, onFireStoreCatchDataListener)
+
+                        return@addOnCompleteListener
+                    }
+                    summitArray.add(data)
+                    saveUserSummitData(summitArray, onFireStoreCatchDataListener)
+
+
+                }
+
+        }
+
+
+    }
+
+    /**
+     * 存現有的清單會用到
+     */
+    private fun saveUserSummitData(
+        summitArray: java.util.ArrayList<SummitData>,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+
+        this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
+        val uid = AuthHandler.getCurrentUser()?.uid ?: return
+        val map = HashMap<String, String>()
+        map["json"] = Gson().toJson(summitArray)
+        firestore.collection(USER_SUMMIT_DATA)
+            .document(uid)
+            .set(map, SetOptions.merge())
+
+        val observer = Observable.just(Unit)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+        observer.subscribe(finishObserver)
+
+    }
+
+    /**
+     * 存第一筆才會用到
+     */
+    private fun saveFirstSummitData(
+        data: SummitData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
+
+        val uid: String = AuthHandler.getCurrentUser()?.uid ?: return
+
+
+        val summitArray = ArrayList<SummitData>()
+
+        summitArray.add(data)
+
+        val map = HashMap<String, String>()
+        map["json"] = Gson().toJson(summitArray)
+
+        firestore.collection(USER_SUMMIT_DATA)
+            .document(uid)
+            .set(map, SetOptions.merge());
+
+        val observer = Observable.just(Unit)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+        observer.subscribe(finishObserver)
+
+    }
+
+    private val finishObserver = object : Observer<Unit>{
+        override fun onSubscribe(d: Disposable) {
+           disposable.add(d)
+        }
+
+        override fun onNext(t: Unit) {
+
+        }
+
+        override fun onError(e: Throwable) {
+            MichaelLog.i("observer error : $e")
+        }
+
+        override fun onComplete() {
+            onFireStoreCatchDataListener.onCatchDataSuccess(Unit)
+        }
+
+    }
+
+
+    fun getUserSummitData(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<ArrayList<SummitData>>) {
+
+        AuthHandler.getCurrentUser()?.uid?.let {
+
+            firestore.collection(USER_SUMMIT_DATA)
+                .document(it)
+                .get()
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful && task.result == null) {
+
+                        MichaelLog.i("沒有登頂資料 result is null")
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        return@addOnCompleteListener
+                    }
+                    val snapshot = task.result
+
+                    if (snapshot == null || snapshot.data == null) {
+
+                        MichaelLog.i("沒有登頂資料 snapshot is null")
+                        onFireStoreCatchDataListener.onCatchDataFail()
+                        return@addOnCompleteListener
+                    }
+
+                    val json = snapshot.data?.get("json") as String
+
+                    val summitArray = Gson().fromJson<ArrayList<SummitData>>(
+                        json,
+                        object : TypeToken<ArrayList<SummitData>>() {}.type
+                    )
+
+                    if (summitArray.isEmpty()){
+
+                        onFireStoreCatchDataListener.onCatchDataFail()
+
+                        return@addOnCompleteListener
+                    }
+                    onFireStoreCatchDataListener.onCatchDataSuccess(summitArray)
+
+                }
+
+        }
+
+
+    }
+
+    fun setUserPostData(
+        data: ShareData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        firestore.collection(USER_POST_DATA)
+            .document("data")
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful && task.result == null) {
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+
+                    MichaelLog.i("沒有分享資料 snapshot is null 建立新的一筆新的")
+
+                    saveFirstShareData(data,onFireStoreCatchDataListener)
+
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val shareArray = Gson().fromJson<ArrayList<ShareData>>(
+                    json,
+                    object : TypeToken<ArrayList<ShareData>>() {}.type
+                )
+                if (shareArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有分享資料 data is null")
+                    saveFirstShareData(data,onFireStoreCatchDataListener)
+
+                    return@addOnCompleteListener
+                }
+                shareArray.add(data)
+                saveShareData(shareArray,onFireStoreCatchDataListener)
+
+
+            }
+
+    }
+
+    private fun saveShareData(
+        shareArray: java.util.ArrayList<ShareData>,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
+        val map = HashMap<String,String>()
+
+        map["json"] = Gson().toJson(shareArray)
+
+        firestore.collection(USER_POST_DATA)
+            .document("data")
+            .set(map, SetOptions.merge())
+
+        val observer = Observable.just(Unit)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+        observer.subscribe(finishObserver)
+    }
+
+    private fun saveFirstShareData(
+        data: ShareData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
+
+        val shareArray = ArrayList<ShareData>()
+        shareArray.add(data)
+        val map = HashMap<String,String>()
+
+        map["json"] = Gson().toJson(shareArray)
+
+        firestore.collection(USER_POST_DATA)
+            .document("data")
+            .set(map, SetOptions.merge())
+
+        val observer = Observable.just(Unit)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+        observer.subscribe(finishObserver)
+
+    }
+
+    fun clear() {
+        disposable.clear()
     }
 
 
@@ -824,4 +1083,5 @@ class FireStoreHandler {
         fun onCatchDataSuccess(data: T)
         fun onCatchDataFail()
     }
+
 }

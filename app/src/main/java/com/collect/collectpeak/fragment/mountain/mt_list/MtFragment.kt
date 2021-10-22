@@ -59,11 +59,14 @@ class MtFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        viewModel.onFragmentStart()
-
         observersHandle()
 
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onFragmentStart()
     }
 
     //所有的觀察者

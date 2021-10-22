@@ -89,7 +89,7 @@
         <com.collect.collectpeak.custom_widget.CollectPeakTextView
             android:id="@+id/mt_percent_title"
             android:textSize="35sp"
-            android:text="0%"
+            android:text="@{vm.mtGoalCountLiveData}"
             app:layout_constraintTop_toTopOf="@id/mt_percent_view"
             app:layout_constraintBottom_toBottomOf="@id/mt_percent_view"
             app:layout_constraintLeft_toLeftOf="@id/mt_percent_view"

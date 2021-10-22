@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
 import com.collect.collectpeak.fragment.member.MemberRepository
+import com.collect.collectpeak.log.MichaelLog
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -48,6 +49,7 @@ class StorageHandler {
             val task = river.putBytes(byteArray)
             task.addOnSuccessListener {
                 river.downloadUrl.addOnSuccessListener {
+                    MichaelLog.i("取得照片網址 : $it")
                     val photoUrl = it.toString()
                     onCatchUploadPhotoUrlListener.onCatchPhoto(photoUrl)
                 }

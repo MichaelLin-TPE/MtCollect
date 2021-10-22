@@ -15,12 +15,15 @@ class SummitData() : Parcelable{
 
     var mtTime : Long = 0
 
+    var description = ""
+
     var photoArray = ArrayList<String>()
 
     constructor(parcel: Parcel) : this() {
         summitId = parcel.readString().toString()
         mtName = parcel.readString().toString()
         mtLevel = parcel.readString().toString()
+        description = parcel.readString().toString()
         mtTime = parcel.readLong()
         parcel.createStringArrayList().let {
             if (it == null){
@@ -35,6 +38,7 @@ class SummitData() : Parcelable{
         parcel.writeString(summitId)
         parcel.writeString(mtName)
         parcel.writeString(mtLevel)
+        parcel.writeString(description)
         parcel.writeLong(mtTime)
         parcel.writeStringList(photoArray)
     }

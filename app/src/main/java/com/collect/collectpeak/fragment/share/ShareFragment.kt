@@ -34,6 +34,9 @@ class ShareFragment : MtCollectorFragment() {
 
     companion object {
 
+        const val PEAK_DATA = 0
+        const val NORMAL_POST = 1
+
         @JvmStatic
         fun newInstance() = ShareFragment().apply {
                 arguments = Bundle().apply {
