@@ -25,9 +25,9 @@ class ImageLoaderHandler {
     fun initImageLoader(){
         imageLoader = ImageLoader.getInstance()
         options = DisplayImageOptions.Builder()
-            .showImageForEmptyUri(R.drawable.hiking_logo)
-            .showImageOnFail(R.drawable.hiking_logo)
-            .showImageOnLoading(R.drawable.hiking_logo)
+            .showImageForEmptyUri(R.drawable.loading)
+            .showImageOnFail(R.drawable.loading)
+            .showImageOnLoading(R.drawable.loading)
             .cacheInMemory(true)
             .cacheOnDisk(true)
             .bitmapConfig(Bitmap.Config.RGB_565)

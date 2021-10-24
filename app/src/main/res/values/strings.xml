@@ -98,4 +98,6 @@
     <string name="title_setting">設定</string>
     <string name="title_delete">移除</string>
     <string name="title_edit">編輯</string>
+    <string name="title_goal_edit">編輯</string>
+    <string name="title_press_me">點我</string>
 </resources>

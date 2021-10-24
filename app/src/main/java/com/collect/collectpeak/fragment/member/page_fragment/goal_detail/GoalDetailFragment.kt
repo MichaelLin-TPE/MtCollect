@@ -2,6 +2,7 @@ package com.collect.collectpeak.fragment.member.page_fragment.goal_detail
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +13,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.GoalEditActivity
 import com.collect.collectpeak.databinding.FragmentGoalDetailBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.GoalSettingDialog
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.Tool
 
 
@@ -57,8 +60,8 @@ class GoalDetailFragment : MtCollectorFragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         viewModel.onFragmentStart(targetSummitData)
 
         observerHandle()
@@ -100,6 +103,17 @@ class GoalDetailFragment : MtCollectorFragment() {
 
             adapter.setDataArray(it)
             adapter.notifyDataSetChanged()
+        })
+
+        viewModel.goToEditPageLiveData.observe(this,{
+            if (it.mtName.isEmpty()){
+                return@observe
+            }
+            MichaelLog.i("前進編輯頁面")
+            val intent = Intent(fragmentActivity,GoalEditActivity::class.java)
+            intent.putExtra("data",it)
+            fragmentActivity.startActivity(intent)
+            Tool.startActivityInAnim(fragmentActivity,1)
         })
     }
 
@@ -151,6 +165,8 @@ class GoalDetailFragment : MtCollectorFragment() {
         super.onPause()
         viewModel.showToastLiveData.value = ""
         viewModel.scrollPositionLiveData.value = 0
+        viewModel.goToEditPageLiveData.value = SummitData()
+        viewModel.goToEditPageLiveData.removeObservers(this)
         viewModel.showToastLiveData.removeObservers(this)
         viewModel.scrollPositionLiveData.removeObservers(this)
     }
@@ -159,7 +175,6 @@ class GoalDetailFragment : MtCollectorFragment() {
         dataBinding.goalDetailRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
         dataBinding.btnBack.setOnClickListener {
             fragmentActivity.finish()
-            Tool.startActivityOutAnim(fragmentActivity, 2)
         }
 
     }

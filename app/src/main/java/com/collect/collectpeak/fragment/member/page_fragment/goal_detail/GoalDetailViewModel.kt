@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.StorageHandler
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.log.MichaelLog
 
 class GoalDetailViewModel : ViewModel() {
 
@@ -16,6 +17,8 @@ class GoalDetailViewModel : ViewModel() {
     val scrollPositionLiveData = MutableLiveData(0)
 
     val updateSummitList = MutableLiveData<ArrayList<SummitData>>()
+
+    val goToEditPageLiveData = MutableLiveData<SummitData>()
 
     private lateinit var allSummitList : ArrayList<SummitData>
 
@@ -35,7 +38,7 @@ class GoalDetailViewModel : ViewModel() {
         })
     }
 
-    private fun scrollToListPosition(data: java.util.ArrayList<SummitData>, targetSummitData: SummitData) {
+    private fun scrollToListPosition(data: ArrayList<SummitData>, targetSummitData: SummitData) {
 
         var position = 0
 
@@ -51,6 +54,10 @@ class GoalDetailViewModel : ViewModel() {
     }
 
     fun onSummitDataEditClickListener(data: SummitData) {
+
+        MichaelLog.i("點擊 : ${data.mtTime}")
+        goToEditPageLiveData.value = data
+
 
     }
 

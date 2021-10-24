@@ -50,6 +50,8 @@ class GoalSettingDialog {
 
         settingDialog.layoutParams = params
 
+        settingDialog.visibility = View.INVISIBLE
+
         this.settingDialog = settingDialog
 
         mask.visibility = View.VISIBLE
@@ -78,7 +80,6 @@ class GoalSettingDialog {
     private fun startAnimation(isShow: Boolean) {
 
         settingDialog.clearAnimation()
-
 
         settingDialog.visibility = View.VISIBLE
 
@@ -116,7 +117,7 @@ class GoalSettingDialog {
             }
 
             override fun onAnimationEnd(p0: Animation?) {
-                MichaelLog.i("結束動畫 : " + settingDialog.y)
+
                 settingDialog.y = settingDialogY.toFloat()
 
                 settingDialog.clearAnimation()

@@ -21,6 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CollectPeak">
         <activity
+            android:name=".activity.GoalEditActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.GoalActivity"
             android:exported="false" />
         <activity
