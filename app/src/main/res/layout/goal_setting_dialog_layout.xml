@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/goal_setting_root"
+    android:background="@drawable/add_gateway_shape"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        android:id="@+id/add_gateway_title"
+        android:textSize="24sp"
+        android:textColor="@color/black"
+        android:text="@string/title_setting"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/setting_edit_view"
+        android:background="@drawable/setting_item_selector"
+        app:layout_constraintTop_toBottomOf="@id/add_gateway_title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="56dp"/>
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/search_icon"
+        android:src="@drawable/edit"
+        app:layout_constraintTop_toTopOf="@id/setting_edit_view"
+        app:layout_constraintBottom_toBottomOf="@id/setting_edit_view"
+        app:layout_constraintLeft_toLeftOf="@id/setting_edit_view"
+        android:layout_marginLeft="16dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"/>
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        app:layout_constraintTop_toTopOf="@id/search_icon"
+        app:layout_constraintBottom_toBottomOf="@id/search_icon"
+        app:layout_constraintLeft_toRightOf="@id/search_icon"
+        android:layout_marginStart="24dp"
+        android:id="@+id/search_gateway_title"
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:text="@string/title_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+    <View
+        android:id="@+id/setting_delete_view"
+        android:background="@drawable/setting_item_selector"
+        app:layout_constraintTop_toBottomOf="@id/setting_edit_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_width="0dp"
+        android:layout_height="56dp"/>
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/scan_qrcode_icon"
+        android:src="@drawable/delete"
+        app:layout_constraintTop_toTopOf="@id/setting_delete_view"
+        app:layout_constraintBottom_toBottomOf="@id/setting_delete_view"
+        app:layout_constraintLeft_toLeftOf="@id/setting_delete_view"
+        android:layout_marginLeft="16dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"/>
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        app:layout_constraintTop_toTopOf="@id/scan_qrcode_icon"
+        app:layout_constraintLeft_toRightOf="@id/scan_qrcode_icon"
+        app:layout_constraintBottom_toBottomOf="@id/scan_qrcode_icon"
+        android:layout_marginStart="24dp"
+        android:id="@+id/scan_qrcode_icon_title"
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:text="@string/title_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

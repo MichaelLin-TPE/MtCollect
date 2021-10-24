@@ -8,11 +8,14 @@ import com.collect.collectpeak.log.MichaelLog
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class StorageHandler {
 
     companion object{
+
+        private var removeCount = 0
 
         private val storage = FirebaseStorage.getInstance().reference
 
@@ -64,7 +67,36 @@ class StorageHandler {
             return byteArray
         }
 
+
+        fun removePhoto(photoArray: ArrayList<String>){
+
+            if (removeCount < photoArray.size){
+
+                val photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(photoArray[removeCount])
+
+                photoRef.delete().addOnSuccessListener {
+
+                    removeCount ++
+                    removePhoto(photoArray)
+
+
+                }.addOnFailureListener {
+
+                }
+
+
+            }else{
+                removeCount = 0
+                MichaelLog.i("照片刪除完成")
+            }
+
+
+
+        }
+
+
     }
+
 
 
 

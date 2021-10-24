@@ -1,6 +1,7 @@
 package com.collect.collectpeak.fragment.member.page_fragment.goal
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,8 +14,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.GoalActivity
 import com.collect.collectpeak.databinding.FragmentGoalBinding
+import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.Tool
 
 
 class GoalFragment : MtCollectorFragment() {
@@ -65,8 +69,24 @@ class GoalFragment : MtCollectorFragment() {
             adapter.setData(it)
 
             dataBinding.goalRecyclerView.adapter = adapter
+
+            adapter.setOnGoalPhotoClickListener(object : GoalAdapter.OnGoalPhotoClickListener{
+                override fun onClick(data: SummitData) {
+
+                    goToGoalPage(data)
+
+                }
+            })
+
         })
 
+    }
+
+    private fun goToGoalPage(data: SummitData) {
+        val intent = Intent(fragmentActivity,GoalActivity::class.java)
+        intent.putExtra("data",data)
+        fragmentActivity.startActivity(intent)
+        Tool.startActivityInAnim(fragmentActivity,2)
     }
 
     override fun onCreateView(

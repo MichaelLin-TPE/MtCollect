@@ -152,14 +152,17 @@ class PreviewViewModel : ViewModel() {
 
         FireStoreHandler.getInstance().setUserPostData(data,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
             override fun onCatchDataSuccess(data: Unit) {
+
                 dismissProgressDialogLiveData.value = true
                 finishPageLiveData.value = true
 
             }
 
             override fun onCatchDataFail() {
+
                 dismissProgressDialogLiveData.value = true
                 showToastLiveData.value = "不知名錯誤,請稍後再試"
+
             }
         })
 
@@ -169,7 +172,7 @@ class PreviewViewModel : ViewModel() {
 
     private fun getByteArray (bitmap: Bitmap) : ByteArray{
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG,50,stream)
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,stream)
         val byteArray = stream.toByteArray()
         bitmap.recycle()
         return byteArray

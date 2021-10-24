@@ -882,6 +882,10 @@ class FireStoreHandler {
 
         observer.subscribe(finishObserver)
 
+        val currentGaolCount = summitArray.size
+
+        saveUserGoalCount(currentGaolCount)
+
     }
 
     /**
@@ -912,6 +916,92 @@ class FireStoreHandler {
             .observeOn(AndroidSchedulers.mainThread())
 
         observer.subscribe(finishObserver)
+
+        val currentGaolCount = summitArray.size
+
+        saveUserGoalCount(currentGaolCount)
+
+    }
+
+    private fun saveUserShareCount(currentShareCount : Int){
+        val uid = AuthHandler.getCurrentUser()?.uid ?: return
+
+        firestore.collection(USER_BASIC_INFO)
+            .document(uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful || task.result == null) {
+
+                    MichaelLog.i("取得使用者基本資料失敗")
+
+
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+                    MichaelLog.i("取得使用者基本資料失敗：snapshot")
+
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val basicData = Gson().fromJson(json, MemberBasicData::class.java)
+
+                basicData.postCount = currentShareCount
+
+
+                val map = HashMap<String,String>()
+
+                map["json"] = Gson().toJson(basicData)
+
+                firestore.collection(USER_BASIC_INFO)
+                    .document(uid)
+                    .set(map, SetOptions.merge())
+            }
+    }
+
+    private fun saveUserGoalCount(currentGaolCount: Int) {
+
+        val uid = AuthHandler.getCurrentUser()?.uid ?: return
+
+        firestore.collection(USER_BASIC_INFO)
+            .document(uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful || task.result == null) {
+
+                    MichaelLog.i("取得使用者基本資料失敗")
+
+
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+                    MichaelLog.i("取得使用者基本資料失敗：snapshot")
+
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val basicData = Gson().fromJson(json, MemberBasicData::class.java)
+
+                basicData.goalCount = currentGaolCount
+
+
+                val map = HashMap<String,String>()
+
+                map["json"] = Gson().toJson(basicData)
+
+                firestore.collection(USER_BASIC_INFO)
+                    .document(uid)
+                    .set(map, SetOptions.merge())
+            }
+
+
 
     }
 
@@ -964,6 +1054,8 @@ class FireStoreHandler {
                         json,
                         object : TypeToken<ArrayList<SummitData>>() {}.type
                     )
+
+                    MichaelLog.i("取得登頂資料 : "+Gson().toJson(summitArray))
 
                     if (summitArray.isEmpty()){
 
@@ -1042,6 +1134,10 @@ class FireStoreHandler {
             .observeOn(AndroidSchedulers.mainThread())
 
         observer.subscribe(finishObserver)
+
+        val currentShareCount = shareArray.size
+
+        saveUserShareCount(currentShareCount)
     }
 
     private fun saveFirstShareData(
@@ -1066,10 +1162,24 @@ class FireStoreHandler {
 
         observer.subscribe(finishObserver)
 
+        val currentShareCount = shareArray.size
+
+        saveUserShareCount(currentShareCount)
+
     }
 
     fun clear() {
         disposable.clear()
+    }
+
+    fun saveUserSummitList(allSummitList: java.util.ArrayList<SummitData>) {
+        val uid = AuthHandler.getCurrentUser()?.uid ?: return
+        val map = HashMap<String,String>()
+        map["json"] = Gson().toJson(allSummitList)
+
+        firestore.collection(USER_SUMMIT_DATA)
+            .document(uid)
+            .set(map, SetOptions.merge())
     }
 
 

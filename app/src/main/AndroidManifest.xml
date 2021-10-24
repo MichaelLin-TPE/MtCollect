@@ -21,9 +21,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CollectPeak">
         <activity
+            android:name=".activity.GoalActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.PeakActivity"
             android:label="@string/title_activity_peak"
-            android:theme="@style/Theme.CollectPeak.NoActionBar"></activity>
+            android:theme="@style/Theme.CollectPeak.NoActionBar" />
         <activity android:name=".activity.SettingActivity" />
         <activity
             android:name=".activity.MemberProfileActivity"

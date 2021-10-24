@@ -20,6 +20,8 @@
     <color name="check_box_checked_color">#697ADD</color>
     <color name="check_box_unchecked_color">#D8D8D8</color>
     <color name="grey">#B9B9B9</color>
+    <color name="mask_background">#A6000000</color>
     <color name="red">#F13325</color>
     <color name="photo_black">#000000</color>
+    <color name="click_pressed">#A0A0A0</color>
 </resources>

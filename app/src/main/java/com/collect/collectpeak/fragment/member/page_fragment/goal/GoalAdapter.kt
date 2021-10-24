@@ -17,6 +17,12 @@ class GoalAdapter : RecyclerView.Adapter<GoalAdapter.ViewHolder>() {
 
     private lateinit var dataArray : ArrayList<SummitData>
 
+    private lateinit var onGoalPhotoClickListener: OnGoalPhotoClickListener
+
+    fun setOnGoalPhotoClickListener(onGoalPhotoClickListener: OnGoalPhotoClickListener){
+        this.onGoalPhotoClickListener = onGoalPhotoClickListener
+    }
+
     fun setData(dataArray : ArrayList<SummitData>){
         this.dataArray = dataArray
     }
@@ -39,6 +45,10 @@ class GoalAdapter : RecyclerView.Adapter<GoalAdapter.ViewHolder>() {
 
         ImageLoaderHandler.getInstance().setPhotoUrl(data.photoArray[0],holder.ivPhoto)
 
+        holder.ivPhoto.setOnClickListener {
+            onGoalPhotoClickListener.onClick(data)
+        }
+
     }
 
     override fun getItemCount(): Int = dataArray.size
@@ -48,6 +58,8 @@ class GoalAdapter : RecyclerView.Adapter<GoalAdapter.ViewHolder>() {
         val root: ConstraintLayout = itemView.findViewById(R.id.goal_root)
 
         val ivPhoto: ImageView = itemView.findViewById(R.id.goal_photo)
+
+        val view : View = itemView
 
         init {
             val layoutParams = root.layoutParams
@@ -61,4 +73,9 @@ class GoalAdapter : RecyclerView.Adapter<GoalAdapter.ViewHolder>() {
 
 
     }
+
+    interface OnGoalPhotoClickListener{
+        fun onClick(data : SummitData)
+    }
+
 }

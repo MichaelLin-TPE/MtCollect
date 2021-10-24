@@ -91,4 +91,11 @@
     <string name="title_mt_level">等級：</string>
     <string name="title_mt_time">登頂時間：</string>
     <string name="title_description">描述些過程吧....</string>
+    <string name="title_summit_info">登頂</string>
+    <string name="title_level">等級 : </string>
+    <string name="title_time">"時間 : "</string>
+    <string name="title_desc">描述 : \n</string>
+    <string name="title_setting">設定</string>
+    <string name="title_delete">移除</string>
+    <string name="title_edit">編輯</string>
 </resources>
