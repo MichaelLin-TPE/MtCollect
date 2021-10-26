@@ -12,6 +12,7 @@ import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.collect.collectpeak.fragment.mountain.peak_photo.PhotoAdapter
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.log.MichaelLog
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,6 +24,7 @@ class GoalDetailAdapter : RecyclerView.Adapter<GoalDetailAdapter.ViewHolder>() {
     private lateinit var onGoalSettingClickListener: OnGoalSettingClickListener
 
     fun setOnGoalSettingClickListener(onGoalSettingClickListener: OnGoalSettingClickListener){
+        MichaelLog.i("init setOnGoalSettingClickListener")
         this.onGoalSettingClickListener = onGoalSettingClickListener
     }
 

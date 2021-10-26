@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.EditContentDialog
 import com.collect.collectpeak.dialog.LoadingDialog
+import com.collect.collectpeak.log.MichaelLog
 
 
 /**
@@ -28,8 +29,14 @@ open class MtCollectorFragment : Fragment() {
 
     fun showConfirmDialog(fragmentManager: FragmentManager,content: String,onConfirmDialogClickListener: ConfirmDialog.OnConfirmDialogClickListener){
 
+
+
         val dialog = ConfirmDialog.newInstance(content)
 
+        if (dialog.dialog != null && dialog.dialog != null && dialog.dialog!!.isShowing && dialog.isRemoving){
+            return
+        }
+        MichaelLog.i("顯示ConfirmDialog")
         dialog.show(fragmentManager,"dialog")
 
         dialog.setOnConfirmDialogClickListener(object : ConfirmDialog.OnConfirmDialogClickListener{
@@ -43,7 +50,18 @@ open class MtCollectorFragment : Fragment() {
 
         })
 
+
+
     }
+
+    private fun showDialog(
+        dialog: ConfirmDialog,
+        fragmentManager: FragmentManager,
+        onConfirmDialogClickListener: ConfirmDialog.OnConfirmDialogClickListener
+    ) {
+
+    }
+
     fun showEditContentDialog(fragmentManager: FragmentManager,content: String,onEditContentDialogClickListener: EditContentDialog.OnEditContentDialogClickListener){
         val dialog = EditContentDialog.newInstance(content)
         dialog.show(fragmentManager,"dialog")

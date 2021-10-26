@@ -1,29 +1,34 @@
 package com.collect.collectpeak.fragment.member.page_fragment.goal_edit
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentGoalEditBinding
+import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
-import com.collect.collectpeak.tool.Tool
+import com.collect.collectpeak.tool.PhotoSelector
 
 
-class GoalEditFragment : Fragment() {
+class GoalEditFragment : MtCollectorFragment() {
 
     private lateinit var targetSummitData: SummitData
 
     private lateinit var fragmentActivity: FragmentActivity
 
     private lateinit var dataBinding : FragmentGoalEditBinding
+
+    private val adapter = GoalEditPhotoAdapter()
 
     private val viewModel : GoalEditViewModel by activityViewModels {
         GoalEditViewModel.GoalEditFactory()
@@ -34,6 +39,10 @@ class GoalEditFragment : Fragment() {
         this.fragmentActivity = context as FragmentActivity
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.showPhotoSelectorViewLiveData.removeObservers(this)
+    }
 
     companion object {
 
@@ -70,25 +79,87 @@ class GoalEditFragment : Fragment() {
         return dataBinding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.onFragmentStart(targetSummitData)
 
-        observerHandle()
-    }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun observerHandle() {
         viewModel.mtPhotoListLivData.observe(this,{
 
-            val adapter = GoalEditPhotoAdapter()
-
-            adapter.setPhotoArray(it)
+            adapter.setData(it)
 
             dataBinding.editRecyclerView.adapter = adapter
 
+            adapter.setonPhotoRemoveClickListener(object : GoalEditPhotoAdapter.OnPhotoRemoveClickListener{
+                override fun onRemove(photoUrl: String) {
+                    MichaelLog.i("onRemove")
+                    viewModel.onPhotoRemoveClickListener(photoUrl)
+                }
+
+                override fun onRemoveBitmap(position : Int) {
+                    MichaelLog.i("onRemoveBitmap")
+                    viewModel.onPhotoRemoveBitmapClickListener(position)
+                }
+
+            })
+
+            adapter.setOnAddPhotoClickListener(object : GoalEditPhotoAdapter.OnAddPhotoClickListener{
+                override fun onAdd() {
+                    viewModel.onAddPhotoClickListener()
+                }
+
+            })
+
+        })
+
+        viewModel.updatePhotoListLiveData.observe(this,{
+            adapter.setData(it)
+            adapter.notifyDataSetChanged()
+        })
+
+
+        viewModel.showPhotoSelectorViewLiveData.observe(this,{
+
+
+
+            MichaelLog.i("顯示照片篩選")
+
+            if (viewLifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED){
+
+                if (it == 0){
+                    showRemovePhotoDialog()
+                    return@observe
+                }
+
+                PhotoSelector.instance.showPhotoSelectorView(fragmentActivity , it) { result ->
+
+                    viewModel.onCatchPhotoResultListener(result,fragmentActivity.contentResolver)
+
+                }
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onFragmentStart(targetSummitData)
+
+        observerHandle()
+
+    }
+
+    private fun showRemovePhotoDialog() {
+        showConfirmDialog(fragmentActivity.supportFragmentManager,fragmentActivity.getString(R.string.title_remove_some_photo),object : ConfirmDialog.OnConfirmDialogClickListener{
+            override fun onConfirm() {
+
+            }
+
+            override fun onCancel() {
+
+            }
 
         })
     }
+
 
     private fun initView(view: View) {
 

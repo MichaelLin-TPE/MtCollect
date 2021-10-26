@@ -100,4 +100,6 @@
     <string name="title_edit">編輯</string>
     <string name="title_goal_edit">編輯</string>
     <string name="title_press_me">點我</string>
+    <string name="title_add_photo">添加\n照片</string>
+    <string name="title_remove_some_photo">請刪除照片後,再新增.</string>
 </resources>

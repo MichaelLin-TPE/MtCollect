@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        android:id="@+id/add_photo"
+        android:textSize="20sp"
+        android:text="@string/title_add_photo"
+        android:gravity="center"
+        android:textColor="@color/news_blue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

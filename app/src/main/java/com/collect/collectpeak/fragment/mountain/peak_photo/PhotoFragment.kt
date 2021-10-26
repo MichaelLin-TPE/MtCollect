@@ -18,6 +18,7 @@ import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.FragmentUtil.Companion.ANIM_LEFT_RIGHT
 import com.collect.collectpeak.tool.GlideEngine
+import com.collect.collectpeak.tool.PhotoSelector
 import com.luck.picture.lib.PictureSelector
 import com.luck.picture.lib.config.PictureMimeType
 
@@ -123,6 +124,7 @@ class PhotoFragment : MtCollectorFragment() {
         dataBinding.photoBtnNext.setOnClickListener {
             viewModel.onNextButtonClickListener()
         }
+
         dataBinding.mtActionBarIgnore.setOnClickListener {
             viewModel.onIgnoreButtonClickListener()
         }
@@ -130,18 +132,12 @@ class PhotoFragment : MtCollectorFragment() {
     }
 
     private fun showSelectPhotoView(){
-        PictureSelector.create(fragmentActivity)
-            .openGallery(PictureMimeType.ofImage())
-            .loadImageEngine(GlideEngine.createGlideEngine())
-            .maxSelectNum(3)
-            .compress(true)
-            .enableCrop(true)
-            .hideBottomControls(false)
-            .showCropFrame(false)
-            .freeStyleCropEnabled(true)
-            .forResult {
-                viewModel.onCatchPhotoListener(it,fragmentActivity.contentResolver)
-            }
+
+        PhotoSelector.instance.showPhotoSelectorView(fragmentActivity) { result ->
+
+            viewModel.onCatchPhotoListener(result, fragmentActivity.contentResolver)
+
+        }
     }
 
 
