@@ -4,8 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.collect.collectpeak.firebase.MountainData
+import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment.Companion.SELECT
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.CalendarHandler
+import com.collect.collectpeak.tool.TempDataHandler
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,6 +25,12 @@ class PeakTimeViewModel : ViewModel() {
 
     val goToSelectPhotoPageLiveData = MutableLiveData<MtPeakData>()
 
+    val btnNextValueLiveData = MutableLiveData<String>()
+
+    val finishLiveData = MutableLiveData<Boolean>()
+
+    private var type = 0
+
     val yearLiveData = MutableLiveData(
         SimpleDateFormat(
             "yyyy",
@@ -36,7 +44,14 @@ class PeakTimeViewModel : ViewModel() {
 
     private var userSelectCalendarData = CalendarData()
 
-    fun onFragmentStart(mountainData: MountainData) {
+    fun onFragmentStart(mountainData: MountainData, type: Int) {
+
+        this.type = type
+
+        if(type == SELECT){
+            btnNextValueLiveData.value = "完成"
+        }
+
 
         this.mountainData = mountainData;
 
@@ -110,6 +125,16 @@ class PeakTimeViewModel : ViewModel() {
     }
 
     fun onNextButtonClickListener() {
+
+
+        if (type == SELECT){
+
+            TempDataHandler.setUserSelectDate(userSelectCalendarData.timeStamp)
+            finishLiveData.value = true
+
+            return
+        }
+
 
         val mtPeakData = MtPeakData()
 

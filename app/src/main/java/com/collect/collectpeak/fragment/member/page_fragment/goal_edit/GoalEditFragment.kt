@@ -15,9 +15,14 @@ import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentGoalEditBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
+import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment
+import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment.Companion.SELECT
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.PhotoSelector
+import com.collect.collectpeak.tool.TempDataHandler
 
 
 class GoalEditFragment : MtCollectorFragment() {
@@ -42,6 +47,7 @@ class GoalEditFragment : MtCollectorFragment() {
     override fun onPause() {
         super.onPause()
         viewModel.showPhotoSelectorViewLiveData.removeObservers(this)
+        TempDataHandler.setUserSelectDate(0)
     }
 
     companion object {
@@ -176,6 +182,27 @@ class GoalEditFragment : MtCollectorFragment() {
             fragmentActivity.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
 
         }
+
+        dataBinding.editBtnDone.setOnClickListener {
+            viewModel.buttonDoneClickListener()
+        }
+
+
+        dataBinding.editMtCalendar.setOnClickListener {
+            goToSelectDatePage()
+        }
+
+        dataBinding.editMtList.setOnClickListener {
+            showSelectPeakDialog()
+        }
+    }
+
+    private fun showSelectPeakDialog() {
+
+    }
+
+    private fun goToSelectDatePage() {
+        FragmentUtil.replace(R.id.container,fragmentActivity.supportFragmentManager,PeakTimeFragment.newInstance(MountainData(),SELECT),true,PeakTimeFragment.javaClass.simpleName,1)
     }
 
 

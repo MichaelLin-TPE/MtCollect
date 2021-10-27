@@ -29,6 +29,8 @@ class PeakTimeFragment : MtCollectorFragment() {
 
     private var mountainData = MountainData()
 
+    private var type = 0
+
     private val adapter = CalendarAdapter()
 
     private val dialog = YearSelectDialog.newInstance()
@@ -39,13 +41,19 @@ class PeakTimeFragment : MtCollectorFragment() {
 
     companion object {
 
+        const val NORMAL = 0
+
+        const val SELECT = 1
+
         @JvmStatic
-        fun newInstance(data: MountainData) =
+        fun newInstance(data: MountainData,type : Int) =
             PeakTimeFragment().apply {
                 arguments = Bundle().apply {
                     this.putSerializable("data",data)
+                    this.putInt("type", type)
                 }
             }
+
     }
 
     override fun onAttach(context: Context) {
@@ -55,12 +63,28 @@ class PeakTimeFragment : MtCollectorFragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.onFragmentStart(mountainData)
+        viewModel.onFragmentStart(mountainData,type)
 
         observerHandle()
     }
 
     private fun observerHandle() {
+
+        viewModel.finishLiveData.observe(this,{
+
+
+            if (!it){
+
+                return@observe
+            }
+
+            fragmentActivity.supportFragmentManager.popBackStack()
+        })
+
+        viewModel.btnNextValueLiveData.observe(this,{
+            dataBinding.peakTimeButton.text = it
+        })
+
         viewModel.calendarLiveData.observe(this,{
 
             adapter.setDataArray(it)
@@ -126,12 +150,15 @@ class PeakTimeFragment : MtCollectorFragment() {
         viewModel.showYeaListDialogLiveData.removeObservers(this)
         viewModel.onPause()
         viewModel.enableNextButtonLiveData.removeObservers(this)
+        viewModel.finishLiveData.value = false
+        viewModel.finishLiveData.removeObservers(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             mountainData = it.getSerializable("data") as MountainData
+            type = it.getInt("type", NORMAL)
         }
     }
 

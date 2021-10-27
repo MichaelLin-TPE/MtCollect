@@ -6,13 +6,17 @@ import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.collect.collectpeak.firebase.FireStoreHandler
+import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.TempDataHandler
 import com.luck.picture.lib.entity.LocalMedia
 import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GoalEditViewModel : ViewModel() {
 
@@ -35,7 +39,20 @@ class GoalEditViewModel : ViewModel() {
 
     private val targetEditData = GoalEditData()
 
+    private val mountainList = ArrayList<MountainData>()
+
     fun onFragmentStart(targetSummitData: SummitData) {
+
+        //這邊會先拿資料
+        FireStoreHandler.getInstance().getMountainList(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<MountainData>>{
+            override fun onCatchDataSuccess(data: ArrayList<MountainData>) {
+                mountainList.addAll(data)
+            }
+
+            override fun onCatchDataFail() {
+            }
+        })
+
 
         this.targetSummitData = targetSummitData
 
@@ -45,11 +62,19 @@ class GoalEditViewModel : ViewModel() {
 
         mtLevelLiveData.value = "等級 : "+targetSummitData.mtLevel
 
-        mtTimeLiveData.value = "時間 : ${SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date(targetSummitData.mtTime))}"
+        val time = if (TempDataHandler.getUserSelectTimeStamp() != 0L) SimpleDateFormat("yyyy/MM/dd",Locale.getDefault()).format(Date(TempDataHandler.getUserSelectTimeStamp()))
+                else SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date(targetSummitData.mtTime))
+
+        this.targetSummitData.mtTime = if (TempDataHandler.getUserSelectTimeStamp() != 0L) TempDataHandler.getUserSelectTimeStamp() else targetSummitData.mtTime
+
+
+        mtTimeLiveData.value = "時間 : $time"
 
         mtDescLiveData.value = targetSummitData.description
 
         mtPhotoListLivData.value = targetEditData
+
+
 
     }
 
@@ -96,6 +121,10 @@ class GoalEditViewModel : ViewModel() {
         targetEditData.newPhotoArray.removeAt(position)
 
         updatePhotoListLiveData.value = targetEditData
+
+    }
+
+    fun buttonDoneClickListener() {
 
     }
 
