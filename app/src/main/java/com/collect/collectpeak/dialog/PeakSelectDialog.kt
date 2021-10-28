@@ -21,6 +21,7 @@ import com.collect.collectpeak.fragment.home.weather.LocationData
 import com.collect.collectpeak.fragment.mountain.peak_time.YearData
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.DpConvertTool
+import com.collect.collectpeak.tool.TempDataHandler
 import com.collect.collectpeak.tool.TypeFaceHelper
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,9 +55,9 @@ class PeakSelectDialog : DialogFragment() {
 
     private lateinit var fragmentActivity: FragmentActivity
 
-    fun setPeak(peak: String, mountainList: ArrayList<MountainData>) {
+    fun setPeak(peak: String) {
 
-        this.mountainList = mountainList
+        this.mountainList = TempDataHandler.mountainList
 
         value = peak
 

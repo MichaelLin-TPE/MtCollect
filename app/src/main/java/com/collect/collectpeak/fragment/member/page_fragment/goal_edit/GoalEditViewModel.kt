@@ -3,6 +3,8 @@ package com.collect.collectpeak.fragment.member.page_fragment.goal_edit
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.MediaStore
+import android.view.View
+import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -10,8 +12,14 @@ import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.OnButtonCallBackListener
 import com.collect.collectpeak.tool.TempDataHandler
 import com.luck.picture.lib.entity.LocalMedia
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -41,6 +49,12 @@ class GoalEditViewModel : ViewModel() {
 
     private val mountainList = ArrayList<MountainData>()
 
+    private lateinit var onMtListButtonClickListener : OnButtonCallBackListener<String>
+
+    fun setOnMtListButtonClickListener(onMtListButtonClickListener : OnButtonCallBackListener<String>){
+        this.onMtListButtonClickListener = onMtListButtonClickListener
+    }
+
     fun onFragmentStart(targetSummitData: SummitData) {
 
         //這邊會先拿資料
@@ -56,11 +70,11 @@ class GoalEditViewModel : ViewModel() {
 
         this.targetSummitData = targetSummitData
 
-        targetEditData.photoArray = targetSummitData.photoArray
+        targetEditData.photoArray = this.targetSummitData.photoArray
 
-        mtNameLiveData.value = "山名 : "+targetSummitData.mtName
+        mtNameLiveData.value = "山名 : "+this.targetSummitData.mtName
 
-        mtLevelLiveData.value = "等級 : "+targetSummitData.mtLevel
+        mtLevelLiveData.value = "等級 : "+this.targetSummitData.mtLevel
 
         val time = if (TempDataHandler.getUserSelectTimeStamp() != 0L) SimpleDateFormat("yyyy/MM/dd",Locale.getDefault()).format(Date(TempDataHandler.getUserSelectTimeStamp()))
                 else SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date(targetSummitData.mtTime))
@@ -70,7 +84,7 @@ class GoalEditViewModel : ViewModel() {
 
         mtTimeLiveData.value = "時間 : $time"
 
-        mtDescLiveData.value = targetSummitData.description
+        mtDescLiveData.value = this.targetSummitData.description
 
         mtPhotoListLivData.value = targetEditData
 
@@ -126,6 +140,25 @@ class GoalEditViewModel : ViewModel() {
 
     fun buttonDoneClickListener() {
 
+    }
+
+
+
+
+    fun onEditMtListClickListener(view: View) {
+        MichaelLog.i("點擊 editList")
+        onMtListButtonClickListener.onCatchResult(targetSummitData.mtName)
+    }
+
+
+    fun onPeakSelectClickListener(peak: String, level: String) {
+
+        targetSummitData.mtName = peak
+        targetSummitData.mtLevel = level
+
+        mtNameLiveData.value = "山名 : "+targetSummitData.mtName
+
+        mtLevelLiveData.value = "等級 : "+targetSummitData.mtLevel
     }
 
 

@@ -3,6 +3,9 @@
 <layout>
     <data>
         <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
+         <variable
             name="vm"
             type="com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditViewModel" />
     </data>
@@ -71,6 +74,7 @@
         <ImageView
             android:id="@+id/edit_mt_list"
             android:contentDescription="@null"
+            android:onClick="@{(v)->clickListener.onMountainListClickListener(v)}"
             app:layout_constraintTop_toTopOf="@id/edit_mt_name"
             app:layout_constraintBottom_toBottomOf="@id/edit_mt_name"
             app:layout_constraintLeft_toRightOf="@id/edit_mt_name"

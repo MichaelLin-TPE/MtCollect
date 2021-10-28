@@ -15,27 +15,35 @@ import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentGoalEditBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
+import com.collect.collectpeak.dialog.PeakSelectDialog
 import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment
 import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment.Companion.SELECT
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.ButtonClickHandler
 import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.PhotoSelector
 import com.collect.collectpeak.tool.TempDataHandler
+import io.reactivex.disposables.CompositeDisposable
 
 
-class GoalEditFragment : MtCollectorFragment() {
+
+class GoalEditFragment : MtCollectorFragment(){
 
     private lateinit var targetSummitData: SummitData
 
     private lateinit var fragmentActivity: FragmentActivity
 
-    private lateinit var dataBinding : FragmentGoalEditBinding
+    private lateinit var dataBinding: FragmentGoalEditBinding
 
     private val adapter = GoalEditPhotoAdapter()
 
-    private val viewModel : GoalEditViewModel by activityViewModels {
+    private val disposable = CompositeDisposable()
+
+    private val peakSelectDialog = PeakSelectDialog.newInstance()
+
+    private val viewModel: GoalEditViewModel by activityViewModels {
         GoalEditViewModel.GoalEditFactory()
     }
 
@@ -48,6 +56,7 @@ class GoalEditFragment : MtCollectorFragment() {
         super.onPause()
         viewModel.showPhotoSelectorViewLiveData.removeObservers(this)
         TempDataHandler.setUserSelectDate(0)
+        disposable.clear()
     }
 
     companion object {
@@ -56,7 +65,7 @@ class GoalEditFragment : MtCollectorFragment() {
         fun newInstance(summitData: SummitData) =
             GoalEditFragment().apply {
                 arguments = Bundle().apply {
-                    this.putParcelable("data",summitData)
+                    this.putParcelable("data", summitData)
                 }
             }
     }
@@ -73,11 +82,14 @@ class GoalEditFragment : MtCollectorFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        dataBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_goal_edit,container,false)
+        dataBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_goal_edit, container, false)
 
         dataBinding.vm = viewModel
 
         dataBinding.lifecycleOwner = this
+
+        dataBinding.clickListener = ButtonClickHandler(viewModel)
 
         initView(dataBinding.root)
 
@@ -86,29 +98,30 @@ class GoalEditFragment : MtCollectorFragment() {
     }
 
 
-
     @SuppressLint("NotifyDataSetChanged")
     private fun observerHandle() {
-        viewModel.mtPhotoListLivData.observe(this,{
+        viewModel.mtPhotoListLivData.observe(this, {
 
             adapter.setData(it)
 
             dataBinding.editRecyclerView.adapter = adapter
 
-            adapter.setonPhotoRemoveClickListener(object : GoalEditPhotoAdapter.OnPhotoRemoveClickListener{
+            adapter.setonPhotoRemoveClickListener(object :
+                GoalEditPhotoAdapter.OnPhotoRemoveClickListener {
                 override fun onRemove(photoUrl: String) {
                     MichaelLog.i("onRemove")
                     viewModel.onPhotoRemoveClickListener(photoUrl)
                 }
 
-                override fun onRemoveBitmap(position : Int) {
+                override fun onRemoveBitmap(position: Int) {
                     MichaelLog.i("onRemoveBitmap")
                     viewModel.onPhotoRemoveBitmapClickListener(position)
                 }
 
             })
 
-            adapter.setOnAddPhotoClickListener(object : GoalEditPhotoAdapter.OnAddPhotoClickListener{
+            adapter.setOnAddPhotoClickListener(object :
+                GoalEditPhotoAdapter.OnAddPhotoClickListener {
                 override fun onAdd() {
                     viewModel.onAddPhotoClickListener()
                 }
@@ -117,33 +130,45 @@ class GoalEditFragment : MtCollectorFragment() {
 
         })
 
-        viewModel.updatePhotoListLiveData.observe(this,{
+        viewModel.updatePhotoListLiveData.observe(this, {
             adapter.setData(it)
             adapter.notifyDataSetChanged()
         })
 
 
-        viewModel.showPhotoSelectorViewLiveData.observe(this,{
-
+        viewModel.showPhotoSelectorViewLiveData.observe(this, {
 
 
             MichaelLog.i("顯示照片篩選")
 
-            if (viewLifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED){
+            if (viewLifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED) {
 
-                if (it == 0){
+                if (it == 0) {
                     showRemovePhotoDialog()
                     return@observe
                 }
 
-                PhotoSelector.instance.showPhotoSelectorView(fragmentActivity , it) { result ->
+                PhotoSelector.instance.showPhotoSelectorView(fragmentActivity, it) { result ->
 
-                    viewModel.onCatchPhotoResultListener(result,fragmentActivity.contentResolver)
+                    viewModel.onCatchPhotoResultListener(result, fragmentActivity.contentResolver)
 
                 }
             }
         })
+
+
+        viewModel.setOnMtListButtonClickListener{ peak->
+            peakSelectDialog.setPeak(peak)
+            peakSelectDialog.show(fragmentActivity.supportFragmentManager,"dialog")
+            peakSelectDialog.setOnPeakConfirmButtonClickListener(object : PeakSelectDialog.OnPeakConfirmButtonClickListener{
+                override fun onClick(peak: String, level: String) {
+                    viewModel.onPeakSelectClickListener(peak,level)
+                }
+            })
+        }
+
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -154,16 +179,19 @@ class GoalEditFragment : MtCollectorFragment() {
     }
 
     private fun showRemovePhotoDialog() {
-        showConfirmDialog(fragmentActivity.supportFragmentManager,fragmentActivity.getString(R.string.title_remove_some_photo),object : ConfirmDialog.OnConfirmDialogClickListener{
-            override fun onConfirm() {
+        showConfirmDialog(
+            fragmentActivity.supportFragmentManager,
+            fragmentActivity.getString(R.string.title_remove_some_photo),
+            object : ConfirmDialog.OnConfirmDialogClickListener {
+                override fun onConfirm() {
 
-            }
+                }
 
-            override fun onCancel() {
+                override fun onCancel() {
 
-            }
+                }
 
-        })
+            })
     }
 
 
@@ -192,18 +220,23 @@ class GoalEditFragment : MtCollectorFragment() {
             goToSelectDatePage()
         }
 
-        dataBinding.editMtList.setOnClickListener {
-            showSelectPeakDialog()
-        }
-    }
-
-    private fun showSelectPeakDialog() {
 
     }
+
+
+
 
     private fun goToSelectDatePage() {
-        FragmentUtil.replace(R.id.container,fragmentActivity.supportFragmentManager,PeakTimeFragment.newInstance(MountainData(),SELECT),true,PeakTimeFragment.javaClass.simpleName,1)
+        FragmentUtil.replace(
+            R.id.container,
+            fragmentActivity.supportFragmentManager,
+            PeakTimeFragment.newInstance(MountainData(), SELECT),
+            true,
+            PeakTimeFragment.javaClass.simpleName,
+            1
+        )
     }
+
 
 
 }

@@ -5,12 +5,14 @@ import com.collect.collectpeak.R
 import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.tool.TempDataHandler
 
 class MtRepositoryImpl : MtRepository {
     override fun getMountainList(onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<MountainData>>) {
 
         FireStoreHandler.getInstance().getMountainList(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<MountainData>>{
             override fun onCatchDataSuccess(data: ArrayList<MountainData>) {
+                TempDataHandler.mountainList = data
                 onFireStoreCatchDataListener.onCatchDataSuccess(data)
             }
 
