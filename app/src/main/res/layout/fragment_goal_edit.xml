@@ -143,6 +143,7 @@
         <com.collect.collectpeak.custom_widget.CollectPeakButton
             android:id="@+id/edit_btn_done"
             android:text="@string/confirm"
+            android:onClick="@{(v)->clickListener.onEditPeakDataDoneButtonClickListener(v)}"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginStart="16dp"

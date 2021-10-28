@@ -211,15 +211,9 @@ class GoalEditFragment : MtCollectorFragment(){
 
         }
 
-        dataBinding.editBtnDone.setOnClickListener {
-            viewModel.buttonDoneClickListener()
-        }
-
-
         dataBinding.editMtCalendar.setOnClickListener {
             goToSelectDatePage()
         }
-
 
     }
 

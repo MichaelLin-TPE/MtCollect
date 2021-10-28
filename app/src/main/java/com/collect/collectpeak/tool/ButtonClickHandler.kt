@@ -11,4 +11,11 @@ class ButtonClickHandler<T>(private val viewModel:T) {
        }
     }
 
+    fun onEditPeakDataDoneButtonClickListener(view: View){
+        if (viewModel is GoalEditViewModel){
+            viewModel.buttonDoneClickListener()
+        }
+
+    }
+
 }
