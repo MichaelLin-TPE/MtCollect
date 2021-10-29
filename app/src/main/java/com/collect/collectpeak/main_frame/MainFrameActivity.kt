@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import com.collect.collectpeak.MtCollectorActivity
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.ActivityHomeBinding
+import com.collect.collectpeak.log.MichaelLog
 import com.google.android.material.tabs.TabLayout
 import java.util.*
 
@@ -50,6 +51,7 @@ class MainFrameActivity : MtCollectorActivity() {
         viewModel.onActivityCreate()
 
         observerFunction()
+
 
     }
 

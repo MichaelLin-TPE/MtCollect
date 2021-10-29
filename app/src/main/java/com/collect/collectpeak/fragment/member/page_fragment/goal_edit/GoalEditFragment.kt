@@ -3,9 +3,12 @@ package com.collect.collectpeak.fragment.member.page_fragment.goal_edit
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
@@ -21,10 +24,7 @@ import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment
 import com.collect.collectpeak.fragment.mountain.peak_time.PeakTimeFragment.Companion.SELECT
 import com.collect.collectpeak.log.MichaelLog
-import com.collect.collectpeak.tool.ButtonClickHandler
-import com.collect.collectpeak.tool.FragmentUtil
-import com.collect.collectpeak.tool.PhotoSelector
-import com.collect.collectpeak.tool.TempDataHandler
+import com.collect.collectpeak.tool.*
 import io.reactivex.disposables.CompositeDisposable
 
 
@@ -156,16 +156,35 @@ class GoalEditFragment : MtCollectorFragment(){
             }
         })
 
+        viewModel.setOnMtListButtonClickListener(object : OnButtonCallBackListener<String>{
+            override fun onCatchResult(result: String) {
+                peakSelectDialog.setPeak(result)
+                peakSelectDialog.show(fragmentActivity.supportFragmentManager,"dialog")
+                peakSelectDialog.setOnPeakConfirmButtonClickListener(object : PeakSelectDialog.OnPeakConfirmButtonClickListener{
+                    override fun onClick(peak: String, level: String) {
+                        viewModel.onPeakSelectClickListener(peak,level)
+                    }
+                })
+            }
 
-        viewModel.setOnMtListButtonClickListener{ peak->
-            peakSelectDialog.setPeak(peak)
-            peakSelectDialog.show(fragmentActivity.supportFragmentManager,"dialog")
-            peakSelectDialog.setOnPeakConfirmButtonClickListener(object : PeakSelectDialog.OnPeakConfirmButtonClickListener{
-                override fun onClick(peak: String, level: String) {
-                    viewModel.onPeakSelectClickListener(peak,level)
-                }
-            })
-        }
+            override fun showLoadingDialog(result: String) {
+                showProgressDialog(fragmentActivity.supportFragmentManager,result)
+            }
+
+            override fun dismissLoadingDialog() {
+                dismissProgressDialog()
+            }
+
+            override fun showToast(result: String) {
+                showToast(result)
+            }
+
+            override fun finishPage() {
+                fragmentActivity.finish()
+                Tool.startActivityOutAnim(fragmentActivity,2)
+            }
+        })
+
 
     }
 
@@ -215,6 +234,20 @@ class GoalEditFragment : MtCollectorFragment(){
             goToSelectDatePage()
         }
 
+        dataBinding.editDesc.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.onCatchDescription(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+        })
     }
 
 

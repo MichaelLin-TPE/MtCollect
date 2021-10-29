@@ -43,7 +43,7 @@ class GoalEditViewModel : ViewModel() {
 
     val showPhotoSelectorViewLiveData = MutableLiveData<Int>()
 
-    private lateinit var targetSummitData: SummitData
+    private lateinit var originalSummitData: SummitData
 
     private val targetEditData = GoalEditData()
 
@@ -68,23 +68,23 @@ class GoalEditViewModel : ViewModel() {
         })
 
 
-        this.targetSummitData = targetSummitData
+        this.originalSummitData = targetSummitData
 
-        targetEditData.photoArray = this.targetSummitData.photoArray
+        targetEditData.photoArray = this.originalSummitData.photoArray
 
-        mtNameLiveData.value = "山名 : "+this.targetSummitData.mtName
+        mtNameLiveData.value = "山名 : "+this.originalSummitData.mtName
 
-        mtLevelLiveData.value = "等級 : "+this.targetSummitData.mtLevel
+        mtLevelLiveData.value = "等級 : "+this.originalSummitData.mtLevel
 
         val time = if (TempDataHandler.getUserSelectTimeStamp() != 0L) SimpleDateFormat("yyyy/MM/dd",Locale.getDefault()).format(Date(TempDataHandler.getUserSelectTimeStamp()))
                 else SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date(targetSummitData.mtTime))
 
-        this.targetSummitData.mtTime = if (TempDataHandler.getUserSelectTimeStamp() != 0L) TempDataHandler.getUserSelectTimeStamp() else targetSummitData.mtTime
+        this.originalSummitData.mtTime = if (TempDataHandler.getUserSelectTimeStamp() != 0L) TempDataHandler.getUserSelectTimeStamp() else targetSummitData.mtTime
 
 
         mtTimeLiveData.value = "時間 : $time"
 
-        mtDescLiveData.value = this.targetSummitData.description
+        mtDescLiveData.value = this.originalSummitData.description
 
         mtPhotoListLivData.value = targetEditData
 
@@ -139,8 +139,24 @@ class GoalEditViewModel : ViewModel() {
     }
 
     fun buttonDoneClickListener() {
+        MichaelLog.i("點擊buttonDone")
+        onMtListButtonClickListener.showLoadingDialog("編輯中")
 
+        FireStoreHandler.getInstance().saveUserEditSummitData(targetEditData,originalSummitData,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
+            override fun onCatchDataSuccess(data: Unit) {
+                onMtListButtonClickListener.dismissLoadingDialog()
 
+                onMtListButtonClickListener.finishPage()
+
+            }
+
+            override fun onCatchDataFail() {
+                onMtListButtonClickListener.dismissLoadingDialog()
+
+                onMtListButtonClickListener.showToast("發生不知名錯誤，請稍後再試")
+
+            }
+        })
 
     }
 
@@ -149,18 +165,22 @@ class GoalEditViewModel : ViewModel() {
 
     fun onEditMtListClickListener(view: View) {
         MichaelLog.i("點擊 editList")
-        onMtListButtonClickListener.onCatchResult(targetSummitData.mtName)
+        onMtListButtonClickListener.onCatchResult(originalSummitData.mtName)
     }
 
 
     fun onPeakSelectClickListener(peak: String, level: String) {
 
-        targetSummitData.mtName = peak
-        targetSummitData.mtLevel = level
+        originalSummitData.mtName = peak
+        originalSummitData.mtLevel = level
 
-        mtNameLiveData.value = "山名 : "+targetSummitData.mtName
+        mtNameLiveData.value = "山名 : "+originalSummitData.mtName
 
-        mtLevelLiveData.value = "等級 : "+targetSummitData.mtLevel
+        mtLevelLiveData.value = "等級 : "+originalSummitData.mtLevel
+    }
+
+    fun onCatchDescription(desc: String) {
+        originalSummitData.description = desc
     }
 
 

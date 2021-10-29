@@ -1,8 +1,10 @@
 package com.collect.collectpeak.firebase
 
+import android.graphics.Bitmap
 import com.collect.collectpeak.fragment.equipment.equipment_select.*
 import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
+import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.fragment.share.ShareData
 import com.collect.collectpeak.log.MichaelLog
@@ -18,6 +20,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.function.Consumer
+import java.util.logging.StreamHandler
 
 class FireStoreHandler {
 
@@ -28,6 +31,12 @@ class FireStoreHandler {
     private lateinit var onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
 
     private val disposable = CompositeDisposable()
+
+    private val deletePhotoArray = ArrayList<String>()
+
+    private val newPeakPhotoArray = ArrayList<Bitmap>()
+
+    private var originalSummitData: SummitData = SummitData()
 
     companion object {
 
@@ -849,7 +858,17 @@ class FireStoreHandler {
 
                         return@addOnCompleteListener
                     }
-                    summitArray.add(data)
+                    var isFoundSameID = false
+                    for ((index, summitData) in summitArray.withIndex()) {
+                        if (summitData.summitId == data.summitId) {
+                            isFoundSameID = true
+                            summitArray[index] = data
+                        }
+                    }
+
+                    if (!isFoundSameID) {
+                        summitArray.add(data)
+                    }
                     saveUserSummitData(summitArray, onFireStoreCatchDataListener)
 
 
@@ -923,7 +942,7 @@ class FireStoreHandler {
 
     }
 
-    private fun saveUserShareCount(currentShareCount : Int){
+    private fun saveUserShareCount(currentShareCount: Int) {
         val uid = AuthHandler.getCurrentUser()?.uid ?: return
 
         firestore.collection(USER_BASIC_INFO)
@@ -952,7 +971,7 @@ class FireStoreHandler {
                 basicData.postCount = currentShareCount
 
 
-                val map = HashMap<String,String>()
+                val map = HashMap<String, String>()
 
                 map["json"] = Gson().toJson(basicData)
 
@@ -992,7 +1011,7 @@ class FireStoreHandler {
                 basicData.goalCount = currentGaolCount
 
 
-                val map = HashMap<String,String>()
+                val map = HashMap<String, String>()
 
                 map["json"] = Gson().toJson(basicData)
 
@@ -1002,12 +1021,11 @@ class FireStoreHandler {
             }
 
 
-
     }
 
-    private val finishObserver = object : Observer<Unit>{
+    private val finishObserver = object : Observer<Unit> {
         override fun onSubscribe(d: Disposable) {
-           disposable.add(d)
+            disposable.add(d)
         }
 
         override fun onNext(t: Unit) {
@@ -1055,9 +1073,9 @@ class FireStoreHandler {
                         object : TypeToken<ArrayList<SummitData>>() {}.type
                     )
 
-                    MichaelLog.i("取得登頂資料 : "+Gson().toJson(summitArray))
+                    MichaelLog.i("取得登頂資料 : " + Gson().toJson(summitArray))
 
-                    if (summitArray.isEmpty()){
+                    if (summitArray.isEmpty()) {
 
                         onFireStoreCatchDataListener.onCatchDataFail()
 
@@ -1090,7 +1108,7 @@ class FireStoreHandler {
 
                     MichaelLog.i("沒有分享資料 snapshot is null 建立新的一筆新的")
 
-                    saveFirstShareData(data,onFireStoreCatchDataListener)
+                    saveFirstShareData(data, onFireStoreCatchDataListener)
 
                     return@addOnCompleteListener
                 }
@@ -1104,12 +1122,12 @@ class FireStoreHandler {
                 if (shareArray.isNullOrEmpty()) {
 
                     MichaelLog.i("沒有分享資料 data is null")
-                    saveFirstShareData(data,onFireStoreCatchDataListener)
+                    saveFirstShareData(data, onFireStoreCatchDataListener)
 
                     return@addOnCompleteListener
                 }
                 shareArray.add(data)
-                saveShareData(shareArray,onFireStoreCatchDataListener)
+                saveShareData(shareArray, onFireStoreCatchDataListener)
 
 
             }
@@ -1121,7 +1139,7 @@ class FireStoreHandler {
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
     ) {
         this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
 
         map["json"] = Gson().toJson(shareArray)
 
@@ -1148,7 +1166,7 @@ class FireStoreHandler {
 
         val shareArray = ArrayList<ShareData>()
         shareArray.add(data)
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
 
         map["json"] = Gson().toJson(shareArray)
 
@@ -1174,12 +1192,90 @@ class FireStoreHandler {
 
     fun saveUserSummitList(allSummitList: java.util.ArrayList<SummitData>) {
         val uid = AuthHandler.getCurrentUser()?.uid ?: return
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(allSummitList)
 
         firestore.collection(USER_SUMMIT_DATA)
             .document(uid)
             .set(map, SetOptions.merge())
+    }
+
+    fun saveUserEditSummitData(
+        targetEditData: GoalEditData,
+        originalSummitData: SummitData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
+
+        Thread{
+            originalSummitData.photoArray.forEach { ori ->
+                var isFoundSamePhoto = false
+                targetEditData.photoArray.forEach { new ->
+                    if (ori == new) {
+                        isFoundSamePhoto = true
+                    }
+                }
+                if (!isFoundSamePhoto) {
+                    deletePhotoArray.add(ori)
+                }
+            }
+
+            this.originalSummitData.photoArray = targetEditData.photoArray
+            this.originalSummitData.mtName = originalSummitData.mtName
+            this.originalSummitData.mtLevel = originalSummitData.mtLevel
+            this.originalSummitData.mtTime = originalSummitData.mtTime
+            this.originalSummitData.summitId = originalSummitData.summitId
+            this.originalSummitData.description = originalSummitData.description
+
+            if (deletePhotoArray.isEmpty() && targetEditData.newPhotoArray.isEmpty()) {
+                setUserSummitData(originalSummitData, onFireStoreCatchDataListener)
+                return@Thread
+            }
+
+            if (deletePhotoArray.isNotEmpty()) {
+                startToDeletePhoto()
+            }
+
+            if (targetEditData.newPhotoArray.isEmpty()){
+                setUserSummitData(originalSummitData,onFireStoreCatchDataListener)
+                return@Thread
+            }
+
+            if (targetEditData.newPhotoArray.isNotEmpty()){
+                newPeakPhotoArray.addAll(targetEditData.newPhotoArray)
+                startToUpLoadPhoto()
+            }
+        }.start()
+
+
+
+    }
+
+    private var uploadPhotoCount = 0
+
+    private fun startToUpLoadPhoto() {
+
+        if(uploadPhotoCount < newPeakPhotoArray.size){
+            StorageHandler.uploadPeakPhoto(StorageHandler.getByteArray(newPeakPhotoArray[uploadPhotoCount]),object : StorageHandler.OnCatchUploadPhotoUrlListener{
+                override fun onCatchPhoto(url: String) {
+                    originalSummitData.photoArray.add(url)
+                    uploadPhotoCount ++
+                    startToUpLoadPhoto()
+                }
+            })
+        }else{
+            setUserSummitData(originalSummitData,onFireStoreCatchDataListener)
+            uploadPhotoCount = 0
+        }
+
+
+    }
+
+
+    private fun startToDeletePhoto() {
+
+        StorageHandler.removePhoto(deletePhotoArray)
+
     }
 
 

@@ -55,14 +55,17 @@ class PeakTimeViewModel : ViewModel() {
 
         this.mountainData = mountainData;
 
-        CalendarHandler.instance.getYearCalendar(getCurrentYear(),
-            object : CalendarHandler.OnCreateCalendarListener {
-                override fun onComplete(calendarArray: ArrayList<CalendarObject>) {
-                    MichaelLog.i("成功取得日曆資料，長度：${calendarArray.size}")
-                    targetCalendarArray = calendarArray
-                    calendarLiveData.value = calendarArray
-                }
-            })
+        Thread{
+            CalendarHandler.instance.getYearCalendar(getCurrentYear(),
+                object : CalendarHandler.OnCreateCalendarListener {
+                    override fun onComplete(calendarArray: ArrayList<CalendarObject>) {
+                        MichaelLog.i("成功取得日曆資料，長度：${calendarArray.size}")
+                        targetCalendarArray = calendarArray
+                        calendarLiveData.value = calendarArray
+                    }
+                })
+        }.start()
+
 
     }
 

@@ -183,6 +183,12 @@ class PeakTimeFragment : MtCollectorFragment() {
 
         dataBinding.btnBack.setOnClickListener {
 
+            if(type == SELECT){
+                fragmentActivity.supportFragmentManager.popBackStack()
+
+                return@setOnClickListener
+            }
+
             fragmentActivity.finish()
             Tool.startActivityOutAnim(fragmentActivity,2)
 
