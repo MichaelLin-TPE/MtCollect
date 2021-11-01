@@ -64,6 +64,7 @@ class StorageHandler {
             bitmap.compress(Bitmap.CompressFormat.JPEG,20,stream)
             val byteArray = stream.toByteArray()
             bitmap.recycle()
+
             return byteArray
         }
 

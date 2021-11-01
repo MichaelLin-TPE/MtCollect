@@ -44,8 +44,6 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
 
             MichaelLog.i("尚未登入 不做拿取資料的動作")
 
-
-
             return
         }
 

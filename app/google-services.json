@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "824567826400-ghei20naq69jefauursrt6mc17hbbj4o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.collect.collectpeak",
+            "certificate_hash": "3d08a1d3915f434e0d7c83a48826b28c27b44ade"
+          }
+        },
+        {
           "client_id": "824567826400-inlaf706mqkddkfsmvlb9ccjop5tv2d2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

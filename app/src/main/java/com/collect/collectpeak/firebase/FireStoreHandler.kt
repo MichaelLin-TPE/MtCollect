@@ -383,6 +383,7 @@ class FireStoreHandler {
     fun getPhotoUrl(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<String>) {
 
         AuthHandler.getCurrentUser()?.uid?.let {
+
             firestore.collection(USER_PHOTO)
                 .document(it)
                 .get()
@@ -446,27 +447,20 @@ class FireStoreHandler {
 
     fun getUserProfile(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<MemberData>) {
 
-        firestore.collection(USER)
-            .document(USER_LIST)
-            .get()
-            .addOnCompleteListener { task ->
-                if (!task.isSuccessful && task.result == null) {
+        val documentReference = firestore.collection(USER).document(USER_LIST)
 
-                    onFireStoreCatchDataListener.onCatchDataFail()
+        documentReference.addSnapshotListener { value, error ->
 
-                    return@addOnCompleteListener
-                }
-                val snapshot = task.result
+            if (error != null) {
 
-                if (snapshot == null || snapshot.data == null) {
+                onFireStoreCatchDataListener.onCatchDataFail()
+                MichaelLog.i("錯誤 無法取的使用者資料")
+                return@addSnapshotListener
+            }
 
-                    onFireStoreCatchDataListener.onCatchDataFail()
+            if (value != null && value.exists()) {
 
-                    return@addOnCompleteListener
-                }
-
-
-                val json = snapshot.data?.get("user_json") as String
+                val json = value.get("user_json") as String
 
                 val userList = Gson().fromJson<ArrayList<MemberData>>(
                     json,
@@ -477,7 +471,7 @@ class FireStoreHandler {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
-                    return@addOnCompleteListener
+                    return@addSnapshotListener
                 }
 
                 var memberData = MemberData()
@@ -494,13 +488,15 @@ class FireStoreHandler {
 
                     onFireStoreCatchDataListener.onCatchDataFail()
 
-                    return@addOnCompleteListener
+                    return@addSnapshotListener
                 }
                 onFireStoreCatchDataListener.onCatchDataSuccess(memberData)
 
 
             }
 
+
+        }
 
     }
 
@@ -1076,16 +1072,24 @@ class FireStoreHandler {
                     MichaelLog.i("取得登頂資料 : " + Gson().toJson(summitArray))
 
                     if (summitArray.isEmpty()) {
-
+                        updateUserSummitCount(0);
                         onFireStoreCatchDataListener.onCatchDataFail()
 
                         return@addOnCompleteListener
                     }
+                    updateUserSummitCount(summitArray.size)
                     onFireStoreCatchDataListener.onCatchDataSuccess(summitArray)
 
                 }
 
         }
+
+
+    }
+
+    private fun updateUserSummitCount(summitCount: Int) {
+
+
 
 
     }
@@ -1191,6 +1195,8 @@ class FireStoreHandler {
     }
 
     fun saveUserSummitList(allSummitList: java.util.ArrayList<SummitData>) {
+        saveUserGoalCount(allSummitList.size)
+
         val uid = AuthHandler.getCurrentUser()?.uid ?: return
         val map = HashMap<String, String>()
         map["json"] = Gson().toJson(allSummitList)
@@ -1198,6 +1204,8 @@ class FireStoreHandler {
         firestore.collection(USER_SUMMIT_DATA)
             .document(uid)
             .set(map, SetOptions.merge())
+
+
     }
 
     fun saveUserEditSummitData(

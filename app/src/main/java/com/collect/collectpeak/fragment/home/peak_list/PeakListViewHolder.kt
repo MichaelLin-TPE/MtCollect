@@ -66,7 +66,7 @@ class PeakListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
 
             override fun onCatchDataFail() {
-                TODO("Not yet implemented")
+
             }
 
         })

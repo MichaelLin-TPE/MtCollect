@@ -1,5 +1,7 @@
 package com.collect.collectpeak.fragment.member.page_fragment.goal_detail
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +21,10 @@ class GoalDetailViewModel : ViewModel() {
     val updateSummitList = MutableLiveData<ArrayList<SummitData>>()
 
     val goToEditPageLiveData = MutableLiveData<SummitData>()
+
+    val finishPageLiveData = MutableLiveData<Boolean>()
+
+
 
     private lateinit var allSummitList : ArrayList<SummitData>
 
@@ -76,15 +82,23 @@ class GoalDetailViewModel : ViewModel() {
                 iterator.remove()
                 break
             }
-
         }
 
         FireStoreHandler.getInstance().saveUserSummitList(allSummitList)
 
         updateSummitList.value = allSummitList
 
+        if (allSummitList.isEmpty()){
+
+            Handler(Looper.myLooper()!!).postDelayed({
+                finishPageLiveData.value = true
+            },500)
+
+        }
 
     }
+
+
 
     private fun startToRemovePhoto(photoArray: java.util.ArrayList<String>) {
 

@@ -114,7 +114,6 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val tvDescription = itemView.findViewById<TextView>(R.id.member_post_description)
 
         fun showView() {
-
             ivPhoto.setOnClickListener {
                 onMemberInfoClickListener.onPhotoSelectListener()
             }
@@ -163,6 +162,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     tvFriendCount.append(data.friendCount.toString())
                     tvGoalCount.append(data.goalCount.toString())
                     tvPostCount.append(data.postCount.toString())
+
                 }
 
                 override fun onCatchDataFail() {

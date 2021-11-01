@@ -1,5 +1,4 @@
 package com.collect.collectpeak.fragment.member.page_fragment.goal
-
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -10,13 +9,24 @@ class GoalViewModel : ViewModel() {
 
     val summitArrayLiveData = MutableLiveData<ArrayList<SummitData>>()
 
+    val showEmptyViewLiveData = MutableLiveData(true)
+
     fun onFragmentResume() {
         FireStoreHandler.getInstance().getUserSummitData(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<SummitData>>{
             override fun onCatchDataSuccess(data: ArrayList<SummitData>) {
+
+                if (data.isEmpty()){
+                    showEmptyViewLiveData.value = true
+                    return
+                }
+                showEmptyViewLiveData.value = false
                 summitArrayLiveData.value = data
+
+
             }
 
             override fun onCatchDataFail() {
+                showEmptyViewLiveData.value = true
 
             }
 

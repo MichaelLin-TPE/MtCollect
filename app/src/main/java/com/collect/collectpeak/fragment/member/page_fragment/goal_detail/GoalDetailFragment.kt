@@ -115,6 +115,16 @@ class GoalDetailFragment : MtCollectorFragment() {
             fragmentActivity.startActivity(intent)
             Tool.startActivityInAnim(fragmentActivity,1)
         })
+
+        viewModel.finishPageLiveData.observe(this , {
+            if (!it){
+                return@observe
+            }
+            fragmentActivity.finish()
+            Tool.startActivityOutAnim(fragmentActivity,2)
+        })
+
+
     }
 
     private fun showGoalSettingDialog(data: SummitData) {
@@ -166,6 +176,8 @@ class GoalDetailFragment : MtCollectorFragment() {
         viewModel.showToastLiveData.value = ""
         viewModel.scrollPositionLiveData.value = 0
         viewModel.goToEditPageLiveData.value = SummitData()
+        viewModel.finishPageLiveData.value = false
+        viewModel.finishPageLiveData.removeObservers(this)
         viewModel.goToEditPageLiveData.removeObservers(this)
         viewModel.showToastLiveData.removeObservers(this)
         viewModel.scrollPositionLiveData.removeObservers(this)
