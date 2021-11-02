@@ -38,7 +38,8 @@
             android:name=".activity.EquipmentActivity"
             android:theme="@style/Theme.MyTranslucent" />
         <activity android:name=".main_frame.MainFrameActivity" />
-        <activity android:name=".activity.LaunchActivity">
+        <activity android:name=".activity.LaunchActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

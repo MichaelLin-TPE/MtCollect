@@ -17,9 +17,9 @@ class SettingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_setting)
 
 
-        FragmentUtil.replace(R.id.container,supportFragmentManager,
-            SettingFragment.newInstance(),true,
-            SettingFragment.javaClass.simpleName,1)
+        val transaction = supportFragmentManager.beginTransaction()
+
+        transaction.replace(R.id.container,SettingFragment.newInstance()).commit()
 
 
         StatusBarTool.setStatusBarSameColorAsActionBar(window,findViewById(R.id.container))

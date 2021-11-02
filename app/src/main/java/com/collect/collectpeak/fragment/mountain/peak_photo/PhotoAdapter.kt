@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.makeramen.roundedimageview.RoundedImageView
 import java.lang.UnsupportedOperationException
@@ -37,6 +39,8 @@ class PhotoAdapter : PagerAdapter() {
         val tvCount = view.findViewById<TextView>(R.id.dialog_view_pager_pic_count)
         tvCount.text =
             String.format(Locale.getDefault(), "%d/%d", position + 1, bitmapArray.size)
+
+        ivPhoto.setBackgroundColor(ContextCompat.getColor(MtCollectorApplication.getInstance().getContext(),R.color.black))
 
         ivPhoto.setImageBitmap(bitmapArray[position])
         container.addView(view)

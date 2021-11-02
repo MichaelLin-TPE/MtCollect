@@ -15,7 +15,9 @@ class GoalActivity : AppCompatActivity() {
 
         val data = intent.extras?.getParcelable<SummitData>("data") as SummitData
 
-        FragmentUtil.replace(R.id.container,supportFragmentManager,GoalDetailFragment.newInstance(data),false,GoalDetailFragment.javaClass.simpleName,2)
+        val transaction = supportFragmentManager.beginTransaction()
+
+        transaction.replace(R.id.container,GoalDetailFragment.newInstance(data)).commit()
 
     }
 }

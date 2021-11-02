@@ -10,16 +10,19 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.activity.PeakActivity
 import com.collect.collectpeak.databinding.FragmentMtBinding
 import com.collect.collectpeak.dialog.LevelDialog
+import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.Tool
 
-class MtFragment : Fragment() {
+class MtFragment : MtCollectorFragment() {
 
     private lateinit var dataBinding : FragmentMtBinding
 
@@ -117,6 +120,12 @@ class MtFragment : Fragment() {
     }
 
     private fun intentToPeakTimePage(data: MountainData) {
+
+        if (!AuthHandler.isLogin()){
+            showToast(fragmentActivity.getString(R.string.title_please_login_first))
+            return
+        }
+
         val intent = Intent(fragmentActivity,PeakActivity::class.java)
 
         intent.putExtra("data",data)

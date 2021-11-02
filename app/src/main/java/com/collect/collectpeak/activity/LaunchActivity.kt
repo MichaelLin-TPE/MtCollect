@@ -41,7 +41,7 @@ class LaunchActivity : MtCollectorActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        setTheme(R.style.Theme_CollectPeak)
         //詢問權限
         verifyStoragePermissions(this)
 

@@ -85,13 +85,11 @@ class HomeFragment : MtCollectorFragment() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
-
+    override fun onResume() {
+        super.onResume()
         viewModel.onFragmentStart()
 
         observersHandle()
-
     }
 
     override fun onPause() {

@@ -15,6 +15,14 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <!--    快速開啟ＡＰＰ-->
+    <style name="SplashTheme" parent="Base.Theme.NoActionBar">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowBackground">@drawable/launch_photo</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 
     <!--    轉場不會有黑瓶的方法-->
     <style name="Theme.MyTranslucent" parent="Theme.MaterialComponents.DayNight.NoActionBar">

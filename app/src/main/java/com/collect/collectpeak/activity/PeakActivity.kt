@@ -20,7 +20,11 @@ class PeakActivity : AppCompatActivity() {
 
         val data = bundle?.getSerializable("data") as MountainData
 
-        FragmentUtil.replace(R.id.container,supportFragmentManager,PeakTimeFragment.newInstance(data,NORMAL),true,PeakTimeFragment.javaClass.simpleName,ANIM_RIGHT_LEFT)
+        val transaction = supportFragmentManager.beginTransaction()
+
+        transaction.replace(R.id.container,PeakTimeFragment.newInstance(data, NORMAL))
+
+        transaction.commit()
 
         StatusBarTool.setStatusBarSameColorAsActionBar(window,findViewById(R.id.container))
 

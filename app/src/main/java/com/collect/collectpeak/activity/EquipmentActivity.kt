@@ -30,9 +30,11 @@ class EquipmentActivity : AppCompatActivity() {
 
         val type : Int? = bundle?.getInt("type",0)
 
+        val transaction = supportFragmentManager.beginTransaction()
+
         if (type == SELECT){
 
-            FragmentUtil.replace(R.id.container,supportFragmentManager,EquipmentFragment.newInstance(SELECT),true,EquipmentFragment.javaClass.simpleName,1)
+            transaction.replace(R.id.container,EquipmentFragment.newInstance(SELECT)).commit()
 
         }else{
 
@@ -41,7 +43,7 @@ class EquipmentActivity : AppCompatActivity() {
             MichaelLog.i("有收到資料：${data?.name}")
 
             data?.let { EquipmentEditFragment.newInstance(it) }?.let {
-                FragmentUtil.replace(R.id.container,supportFragmentManager,it,true,EquipmentEditFragment.javaClass.simpleName,1)
+                transaction.replace(R.id.container,it).commit()
             }
         }
 
