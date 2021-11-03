@@ -11,4 +11,6 @@ interface OnButtonCallBackListener<T> {
 
     fun finishPage()
 
+    fun goToSelectDatePage()
+
 }

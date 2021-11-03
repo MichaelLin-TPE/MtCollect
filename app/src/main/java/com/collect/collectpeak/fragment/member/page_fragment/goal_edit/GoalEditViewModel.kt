@@ -12,6 +12,7 @@ import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.main_frame.OnBackButtonClickEventCallBackListener
 import com.collect.collectpeak.tool.OnButtonCallBackListener
 import com.collect.collectpeak.tool.TempDataHandler
 import com.luck.picture.lib.entity.LocalMedia
@@ -50,6 +51,12 @@ class GoalEditViewModel : ViewModel() {
     private val mountainList = ArrayList<MountainData>()
 
     private lateinit var onMtListButtonClickListener : OnButtonCallBackListener<String>
+
+    private lateinit var onBackButtonClickEventCallBackListener: OnBackButtonClickEventCallBackListener
+
+    fun setOnBackButtonClickEventCallBackListener(onBackButtonClickEventCallBackListener: OnBackButtonClickEventCallBackListener){
+        this.onBackButtonClickEventCallBackListener = onBackButtonClickEventCallBackListener
+    }
 
     fun setOnMtListButtonClickListener(onMtListButtonClickListener : OnButtonCallBackListener<String>){
         this.onMtListButtonClickListener = onMtListButtonClickListener
@@ -181,6 +188,14 @@ class GoalEditViewModel : ViewModel() {
 
     fun onCatchDescription(desc: String) {
         originalSummitData.description = desc
+    }
+
+    fun onBackButtonClickListener() {
+        onBackButtonClickEventCallBackListener.onBackClick()
+    }
+
+    fun onGoalCalendarSelectListener() {
+        onMtListButtonClickListener.goToSelectDatePage()
     }
 
 

@@ -40,6 +40,8 @@ class MtViewModel(private val mtRepository: MtRepository) : ViewModel() {
 
     fun onLevelButtonClickListener(level: String) {
 
+        mtSpinnerTitleLiveData.value = level
+
         val mtList = mtListLiveData.value as ArrayList<MountainData>
 
         if (mtList.isNullOrEmpty()){
@@ -51,6 +53,11 @@ class MtViewModel(private val mtRepository: MtRepository) : ViewModel() {
                 updateMtList.add(data)
             }
         }
+
+        if (level == "全部"){
+            updateMtList.addAll(mtList)
+        }
+
         mtListUpdateLiveData.value = updateMtList
 
 

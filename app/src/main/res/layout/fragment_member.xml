@@ -4,6 +4,9 @@
 <layout>
     <data>
         <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
+        <variable
             name="vm"
             type="com.collect.collectpeak.fragment.member.MemberViewModel" />
     </data>
@@ -40,6 +43,7 @@
                 android:id="@+id/action_setting"
                 android:visibility="@{vm.showSettingIconLiveData}"
                 app:layout_constraintTop_toTopOf="parent"
+                android:onClick="@{(v)->clickListener.onMemberSettingClickListener(v)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginEnd="16dp"

@@ -3,14 +3,12 @@ package com.collect.collectpeak.fragment.mountain.mt_list
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
@@ -20,6 +18,7 @@ import com.collect.collectpeak.dialog.LevelDialog
 import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.firebase.MountainData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.ButtonClickHandler
 import com.collect.collectpeak.tool.Tool
 
 class MtFragment : MtCollectorFragment() {
@@ -58,18 +57,10 @@ class MtFragment : MtCollectorFragment() {
 
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-
-        observersHandle()
-
-
-    }
-
     override fun onResume() {
         super.onResume()
         viewModel.onFragmentStart()
+        observersHandle()
     }
 
     //所有的觀察者
@@ -99,7 +90,7 @@ class MtFragment : MtCollectorFragment() {
             }
 
             val levelDialog = LevelDialog.newInstance()
-            levelDialog.setLevelArray(it)
+            levelDialog.setLevelArray(it,viewModel.mtSpinnerTitleLiveData.value)
             levelDialog.show(fragmentActivity.supportFragmentManager,"dialog")
             levelDialog.setOnLevelButtonClickListener(object : LevelDialog.OnLevelButtonClickListener{
                 override fun onClick(level: String) {
@@ -144,16 +135,9 @@ class MtFragment : MtCollectorFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         dataBinding = DataBindingUtil.inflate(LayoutInflater.from(fragmentActivity),R.layout.fragment_mt,container,false)
         dataBinding.vm = viewModel
+        dataBinding.clickListener = ButtonClickHandler(viewModel)
         dataBinding.lifecycleOwner = this
-        initView()
         return dataBinding.root
     }
-
-    private fun initView() {
-        dataBinding.mtSpinnerView.setOnClickListener {
-            viewModel.onLevelSpinnerClickListener()
-        }
-    }
-
 
 }

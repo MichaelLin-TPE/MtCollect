@@ -5,6 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
+        <variable
             name="vm"
             type="com.collect.collectpeak.fragment.mountain.mt_list.MtViewModel" />
     </data>
@@ -40,6 +43,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mt_spinner_view"
             android:background="@drawable/weather_spinner_shape"
+            android:onClick="@{(v)->clickListener.onLevelPickerClickListener(v)}"
             app:layout_constraintTop_toTopOf="@id/mt_percent_view"
             app:layout_constraintRight_toLeftOf="@id/mt_percent_view"
             app:layout_constraintLeft_toLeftOf="parent"

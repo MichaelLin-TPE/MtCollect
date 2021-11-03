@@ -3,6 +3,9 @@
 <layout>
     <data>
         <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
+        <variable
             name="vm"
             type="com.collect.collectpeak.fragment.equipment.EquipmentListViewModel" />
     </data>
@@ -31,6 +34,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 android:layout_marginStart="16dp"
                 android:visibility="@{vm.showDeleteIconLiveData}"
+                android:onClick="@{(v)->clickListener.onEquipmentListDoneButtonClickListener(v)}"
                 android:textSize="25sp"
                 android:text="@string/done"
                 android:layout_width="wrap_content"
@@ -55,6 +59,7 @@
                 android:layout_marginEnd="16dp"
                 android:enabled="@{vm.deleteButtonEnable}"
                 android:visibility="@{vm.showDeleteIconLiveData}"
+                android:onClick="@{(v)->clickListener.onShowDeleteConfirmDialogClickListener(v)}"
                 android:textSize="25sp"
                 android:text="@string/remove"
                 android:layout_width="wrap_content"
@@ -88,6 +93,7 @@
                 app:layout_constraintTop_toBottomOf="@id/equipment_icon"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                android:onClick="@{(v)->clickListener.onCreateEquipmentClickListener(v)}"
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
                 android:text="@string/create"
@@ -110,6 +116,7 @@
             android:id="@+id/equipment_add_icon"
             android:src="@drawable/add"
             android:scaleType="fitXY"
+            android:onClick="@{(v)->clickListener.onCreateEquipmentClickListener(v)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginBottom="30dp"

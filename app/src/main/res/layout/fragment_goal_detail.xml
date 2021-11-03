@@ -3,7 +3,9 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
         <variable
             name="vm"
             type="com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDetailViewModel" />
@@ -31,7 +33,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="16dp"
+                android:contentDescription="@null"
                 android:src="@drawable/back"
+                android:onClick="@{(v)->clickListener.onBackButtonClickListener(v)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

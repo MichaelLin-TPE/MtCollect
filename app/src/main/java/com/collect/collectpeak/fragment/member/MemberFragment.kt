@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
@@ -20,10 +21,12 @@ import com.collect.collectpeak.activity.MemberProfileActivity
 import com.collect.collectpeak.activity.SettingActivity
 import com.collect.collectpeak.databinding.FragmentMemberBinding
 import com.collect.collectpeak.dialog.LoadingDialog
+import com.collect.collectpeak.tool.ButtonClickHandler
 import com.collect.collectpeak.tool.GoogleLoginTool
 import com.collect.collectpeak.tool.GoogleLoginTool.Companion.RC_SIGN_IN
 import com.collect.collectpeak.tool.Tool
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.SignInButton
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.ByteArrayOutputStream
@@ -77,6 +80,7 @@ class MemberFragment : MtCollectorFragment() {
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_member, container, false)
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
+        dataBinding.clickListener = ButtonClickHandler(viewModel)
         initView(dataBinding.root)
 
         // Inflate the layout for this fragment
@@ -84,25 +88,26 @@ class MemberFragment : MtCollectorFragment() {
     }
 
     private fun initView(root: View) {
-
+        GoogleLoginTool.setActivity(fragmentActivity)
         Tool.setGoogleButtonText(
             dataBinding.loginGoogle,
             fragmentActivity.getString(R.string.google_login)
         )
 
+        dataBinding.memberRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
+
+        viewModel.setMemberClickEventCallBackListener(object : MemberClickEventCallBackListener{
+            override fun onSettingClickListener() {
+                intentToSettingPage()
+            }
+        })
+
         dataBinding.loginGoogle.setOnClickListener {
-            GoogleLoginTool.setActivity(fragmentActivity)
             viewModel.onGoogleLoginClickListener()
         }
 
-        dataBinding.memberRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
-
-
-        dataBinding.actionSetting.setOnClickListener {
-            intentToSettingPage()
-        }
-
     }
+
 
     private fun intentToSettingPage() {
         val intent = Intent(fragmentActivity,SettingActivity::class.java)

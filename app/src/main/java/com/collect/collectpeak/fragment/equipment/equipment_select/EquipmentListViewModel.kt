@@ -16,6 +16,8 @@ class EquipmentListViewModel(
         this.onEquipmentCheckClickListener = onEquipmentCheckClickListener
     }
 
+
+
     val equipmentTitleLiveData = MutableLiveData(
         when(equipmentObject.title){
             "body"->{

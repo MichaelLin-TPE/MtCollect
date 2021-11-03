@@ -183,6 +183,10 @@ class GoalEditFragment : MtCollectorFragment(){
                 fragmentActivity.finish()
                 Tool.startActivityOutAnim(fragmentActivity,2)
             }
+
+            override fun goToSelectDatePage() {
+                onGoToSelectDatePage()
+            }
         })
 
 
@@ -222,16 +226,10 @@ class GoalEditFragment : MtCollectorFragment(){
 
         dataBinding.editRecyclerView.layoutManager = linearLayoutManager
 
-        dataBinding.btnBack.setOnClickListener {
-
+        viewModel.setOnBackButtonClickEventCallBackListener{
             MichaelLog.i("關閉編輯頁面")
             fragmentActivity.finish()
             fragmentActivity.overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
-
-        }
-
-        dataBinding.editMtCalendar.setOnClickListener {
-            goToSelectDatePage()
         }
 
         dataBinding.editDesc.addTextChangedListener(object : TextWatcher{
@@ -253,7 +251,7 @@ class GoalEditFragment : MtCollectorFragment(){
 
 
 
-    private fun goToSelectDatePage() {
+    private fun onGoToSelectDatePage() {
         FragmentUtil.replace(
             R.id.container,
             fragmentActivity.supportFragmentManager,

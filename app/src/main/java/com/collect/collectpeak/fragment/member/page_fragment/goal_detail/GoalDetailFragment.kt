@@ -19,6 +19,8 @@ import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.GoalSettingDialog
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.main_frame.OnBackButtonClickEventCallBackListener
+import com.collect.collectpeak.tool.ButtonClickHandler
 import com.collect.collectpeak.tool.Tool
 
 
@@ -164,7 +166,7 @@ class GoalDetailFragment : MtCollectorFragment() {
 
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
-
+        dataBinding.clickListener = ButtonClickHandler(viewModel)
         initView(dataBinding.root)
 
         // Inflate the layout for this fragment
@@ -185,9 +187,11 @@ class GoalDetailFragment : MtCollectorFragment() {
 
     private fun initView(root: View) {
         dataBinding.goalDetailRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
-        dataBinding.btnBack.setOnClickListener {
+
+        viewModel.setOnBackButtonClickEventCallBackListener {
             fragmentActivity.finish()
         }
+
 
     }
 

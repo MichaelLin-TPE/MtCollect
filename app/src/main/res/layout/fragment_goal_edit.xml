@@ -31,6 +31,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
+                android:onClick="@{(v)->clickListener.onBackButtonClickListener(v)}"
                 android:layout_marginStart="16dp"
                 android:contentDescription="@null"
                 android:layout_width="24dp"
@@ -111,6 +112,7 @@
 
         <ImageView
             android:id="@+id/edit_mt_calendar"
+            android:onClick="@{(v)->clickListener.onGoalCalendarSelectListener(v)}"
             app:layout_constraintTop_toTopOf="@id/edit_mt_time"
             app:layout_constraintBottom_toBottomOf="@id/edit_mt_time"
             app:layout_constraintLeft_toRightOf="@id/edit_mt_time"

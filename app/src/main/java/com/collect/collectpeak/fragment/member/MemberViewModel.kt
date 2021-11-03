@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.GoogleLoginTool
-import kotlin.coroutines.coroutineContext
 
 class MemberViewModel(private val repository: MemberRepository) : ViewModel() {
 
@@ -26,7 +25,11 @@ class MemberViewModel(private val repository: MemberRepository) : ViewModel() {
 
     val showSettingIconLiveData = MutableLiveData<Int>()
 
-    private val targetUser = AuthHandler.getCurrentUser()
+    private lateinit var onMemberClickEventCallBackListener: MemberClickEventCallBackListener
+
+    fun setMemberClickEventCallBackListener(onMemberClickEventCallBackListener: MemberClickEventCallBackListener){
+        this.onMemberClickEventCallBackListener = onMemberClickEventCallBackListener
+    }
 
     fun onFragmentStart() {
 
@@ -89,6 +92,10 @@ class MemberViewModel(private val repository: MemberRepository) : ViewModel() {
             }
 
         })
+    }
+
+    fun onMemberSettingClickListener() {
+        onMemberClickEventCallBackListener.onSettingClickListener()
     }
 
 

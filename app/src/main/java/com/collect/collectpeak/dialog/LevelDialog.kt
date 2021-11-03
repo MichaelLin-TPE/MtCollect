@@ -10,13 +10,10 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.RecyclerView
 import cn.carbswang.android.numberpickerview.library.NumberPickerView
 import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.collect.collectpeak.custom_widget.CollectPeakButton
-import com.collect.collectpeak.fragment.home.HomeFragment
-import com.collect.collectpeak.fragment.home.weather.LocationData
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.DpConvertTool
 import com.collect.collectpeak.tool.TypeFaceHelper
@@ -36,7 +33,7 @@ class LevelDialog : DialogFragment() {
 
     private var value = "全部"
 
-    private var index = 0;
+    private var index = 0
 
     fun setOnLevelButtonClickListener(onLevelButtonClickListener: OnLevelButtonClickListener) {
         this.onLevelButtonClickListener = onLevelButtonClickListener
@@ -47,8 +44,20 @@ class LevelDialog : DialogFragment() {
 
     private lateinit var levelArray: ArrayList<String>
 
-    fun setLevelArray(levelArray: ArrayList<String>) {
+    fun setLevelArray(levelArray: ArrayList<String>, value: String?) {
+        MichaelLog.i("value : $value")
         this.levelArray = levelArray
+        value.let {
+            if (it == null){
+                return@let
+            }
+            this.value = it
+        }
+        for((index, level) in levelArray.withIndex()){
+            if (level == this.value){
+                this.index = index
+            }
+        }
     }
 
 
@@ -78,11 +87,9 @@ class LevelDialog : DialogFragment() {
 
     private fun initView(view: View) {
         val levelPicker = view.findViewById<NumberPickerView>(R.id.location_picker)
-
-
         val levelList = arrayOfNulls<String>(levelArray.size)
 
-        for ((index, level) in levelArray.withIndex()) {
+        for ((index , level) in levelArray.withIndex()){
             levelList[index] = level
         }
         levelPicker.displayedValues = levelList

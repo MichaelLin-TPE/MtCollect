@@ -9,7 +9,8 @@ import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentUserData
 import com.collect.collectpeak.log.MichaelLog
 
-class EquipmentListViewModel(private val equipmentListRepository: EquipmentListRepository) : ViewModel() {
+class EquipmentListViewModel(private val equipmentListRepository: EquipmentListRepository) :
+    ViewModel() {
 
 
     val defaultViewLiveData = MutableLiveData<Boolean>()
@@ -24,23 +25,27 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
 
     val updateDeleteView = MutableLiveData<ArrayList<EquipmentUserData>>()
 
-    val showDeleteConfirmDialog = MutableLiveData<Boolean>()
-
     val deleteButtonEnable = MutableLiveData<Boolean>()
 
     private val userSelectDeleteData = ArrayList<EquipmentUserData>()
 
     private var totalUserEquipmentData = ArrayList<EquipmentUserData>()
 
+    private lateinit var onEquipmentClickResultCallBackListener: OnEquipmentClickResultCallBackListener
+
+    fun setOnEquipmentClickResultCallBackListener(onEquipmentClickResultCallBackListener: OnEquipmentClickResultCallBackListener) {
+        this.onEquipmentClickResultCallBackListener = onEquipmentClickResultCallBackListener;
+    }
+
     fun onFragmentStart() {
         deleteButtonEnable.value = false
         defaultViewLiveData.value = true
-        equipmentViewLiveData.value=  false
+        equipmentViewLiveData.value = false
         showDeleteIconLiveData.value = View.GONE
         showDeleteListView.value = false
         updateDeleteView.value = ArrayList()
 
-        if (!AuthHandler.isLogin()){
+        if (!AuthHandler.isLogin()) {
 
             MichaelLog.i("尚未登入 不做拿取資料的動作")
 
@@ -49,11 +54,12 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
 
 
 
-        equipmentListRepository.getCurrentUserEquipment(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>>{
+        equipmentListRepository.getCurrentUserEquipment(object :
+            FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<EquipmentUserData>> {
             override fun onCatchDataSuccess(data: ArrayList<EquipmentUserData>) {
                 totalUserEquipmentData = data
                 defaultViewLiveData.value = false
-                equipmentViewLiveData.value =  true
+                equipmentViewLiveData.value = true
                 updateEquipmentListLiveData.value = data
             }
 
@@ -80,7 +86,7 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
 
     private fun updateEquipmentList(data: EquipmentUserData) {
         totalUserEquipmentData.forEach {
-            if (data.equipmentID == it.equipmentID){
+            if (data.equipmentID == it.equipmentID) {
                 it.isDeleteCheck = data.isDeleteCheck
             }
         }
@@ -89,7 +95,7 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
     }
 
     private fun collectUserSelectDeleteData(data: EquipmentUserData) {
-        if (userSelectDeleteData.isEmpty()){
+        if (userSelectDeleteData.isEmpty()) {
             userSelectDeleteData.add(data)
             checkDeleteButtonEnable()
             MichaelLog.i("移除資料收集到的數量：${userSelectDeleteData.size}")
@@ -97,12 +103,12 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
         }
         var isFoundSameData = false
         userSelectDeleteData.forEach {
-            if (data.equipmentID == it.equipmentID){
+            if (data.equipmentID == it.equipmentID) {
                 isFoundSameData = true
                 return@forEach
             }
         }
-        if (isFoundSameData){
+        if (isFoundSameData) {
             userSelectDeleteData.remove(data)
             checkDeleteButtonEnable()
             MichaelLog.i("移除資料收集到的數量：${userSelectDeleteData.size}")
@@ -115,32 +121,32 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
     }
 
     fun onDeleteConfirmClickListener() {
-        showDeleteConfirmDialog.value = true
+        onEquipmentClickResultCallBackListener.onShowDeleteConfirmDialog()
     }
 
     fun onConfirmDeleteClickListener() {
-        equipmentListRepository.deleteUserEquipmentData(userSelectDeleteData,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
-            override fun onCatchDataSuccess(data: Unit) {
-                MichaelLog.i("刪除成功")
-                showDeleteListView.value = false
-                showDeleteIconLiveData.value = View.GONE
-            }
+        equipmentListRepository.deleteUserEquipmentData(userSelectDeleteData,
+            object : FireStoreHandler.OnFireStoreCatchDataListener<Unit> {
+                override fun onCatchDataSuccess(data: Unit) {
+                    MichaelLog.i("刪除成功")
+                    showDeleteListView.value = false
+                    showDeleteIconLiveData.value = View.GONE
+                }
 
-            override fun onCatchDataFail() {
-                MichaelLog.i("刪除失敗")
-            }
-        })
+                override fun onCatchDataFail() {
+                    MichaelLog.i("刪除失敗")
+                }
+            })
     }
 
 
-    private fun checkDeleteButtonEnable(){
-        if (userSelectDeleteData.isEmpty()){
+    private fun checkDeleteButtonEnable() {
+        if (userSelectDeleteData.isEmpty()) {
             deleteButtonEnable.value = false
             return
         }
         deleteButtonEnable.value = true
     }
-
 
 
     fun onDoneButtonClickListener() {
@@ -153,8 +159,13 @@ class EquipmentListViewModel(private val equipmentListRepository: EquipmentListR
 
     }
 
+    fun onCreateEquipmentClickListener() {
+        onEquipmentClickResultCallBackListener.onIntentToEquipmentSelectPage()
+    }
 
-    open class EquipmentListViewModelFactory(private val equipmentListRepository: EquipmentListRepository) : ViewModelProvider.NewInstanceFactory(){
+
+    open class EquipmentListViewModelFactory(private val equipmentListRepository: EquipmentListRepository) :
+        ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return EquipmentListViewModel(equipmentListRepository) as T

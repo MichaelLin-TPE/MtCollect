@@ -9,6 +9,7 @@ import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.StorageHandler
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.main_frame.OnBackButtonClickEventCallBackListener
 
 class GoalDetailViewModel : ViewModel() {
 
@@ -24,7 +25,11 @@ class GoalDetailViewModel : ViewModel() {
 
     val finishPageLiveData = MutableLiveData<Boolean>()
 
+    private lateinit var onBackButtonClickEventCallBackListener: OnBackButtonClickEventCallBackListener
 
+    fun setOnBackButtonClickEventCallBackListener(onBackButtonClickEventCallBackListener: OnBackButtonClickEventCallBackListener){
+        this.onBackButtonClickEventCallBackListener = onBackButtonClickEventCallBackListener
+    }
 
     private lateinit var allSummitList : ArrayList<SummitData>
 
@@ -104,6 +109,10 @@ class GoalDetailViewModel : ViewModel() {
 
         StorageHandler.removePhoto(photoArray)
 
+    }
+
+    fun onBackButtonClickListener() {
+        onBackButtonClickEventCallBackListener.onBackClick()
     }
 
 
