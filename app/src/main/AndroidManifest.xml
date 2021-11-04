@@ -21,6 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CollectPeak">
         <activity
+            android:name=".activity.PostActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.GoalEditActivity"
             android:exported="false" />
         <activity
@@ -38,7 +41,8 @@
             android:name=".activity.EquipmentActivity"
             android:theme="@style/Theme.MyTranslucent" />
         <activity android:name=".main_frame.MainFrameActivity" />
-        <activity android:name=".activity.LaunchActivity"
+        <activity
+            android:name=".activity.LaunchActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

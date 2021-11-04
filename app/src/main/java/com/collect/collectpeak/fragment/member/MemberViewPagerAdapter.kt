@@ -3,10 +3,9 @@ package com.collect.collectpeak.fragment.member
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.collect.collectpeak.fragment.member.page_fragment.goal.GoalFragment
-import com.collect.collectpeak.fragment.member.page_fragment.PostFragment
+import com.collect.collectpeak.fragment.member.page_fragment.post.PostFragment
 import com.collect.collectpeak.log.MichaelLog
 
 class MemberViewPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {

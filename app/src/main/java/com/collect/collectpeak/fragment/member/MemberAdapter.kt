@@ -3,7 +3,6 @@ package com.collect.collectpeak.fragment.member
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -13,14 +12,11 @@ import androidx.viewpager.widget.ViewPager
 import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
 import com.collect.collectpeak.firebase.FireStoreHandler
-import com.collect.collectpeak.fragment.member.page_fragment.PostFragment
+import com.collect.collectpeak.fragment.member.page_fragment.post.PostFragment
 import com.collect.collectpeak.fragment.member.page_fragment.goal.GoalFragment
 import com.collect.collectpeak.log.MichaelLog
-import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.ImageLoaderHandler
-import com.collect.collectpeak.tool.Tool
 import com.google.android.material.tabs.TabLayout
-import java.lang.reflect.Member
 
 class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -203,7 +199,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             val transaction = fragmentManager.beginTransaction()
 
-            transaction.replace(R.id.member_container,PostFragment.newInstance())
+            transaction.replace(R.id.member_container, PostFragment.newInstance())
             transaction.commit()
 
             postView.setOnClickListener{
@@ -212,7 +208,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 ivGoal.setImageResource(R.drawable.goal_not_press)
                 postLine.visibility = View.VISIBLE
                 goalLine.visibility = View.GONE
-                postTransaction.replace(R.id.member_container,PostFragment.newInstance())
+                postTransaction.replace(R.id.member_container, PostFragment.newInstance())
                 postTransaction.commit()
             }
             goalView.setOnClickListener {
