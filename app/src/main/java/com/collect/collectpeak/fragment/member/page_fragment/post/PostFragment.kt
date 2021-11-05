@@ -1,6 +1,7 @@
 package com.collect.collectpeak.fragment.member.page_fragment.post
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,7 +12,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.PostActivity
 import com.collect.collectpeak.databinding.FragmentPostBinding
+import com.collect.collectpeak.fragment.share.ShareData
+import com.collect.collectpeak.tool.Tool
 
 
 class PostFragment : Fragment() {
@@ -79,15 +83,18 @@ class PostFragment : Fragment() {
             dataBinding.postRecyclerView.adapter = adapter
 
             adapter.setOnPostPhotoClickListener {
-                intentToPostEditPage()
+                intentToPostEditPage(it)
             }
 
         })
 
     }
 
-    private fun intentToPostEditPage() {
-
+    private fun intentToPostEditPage(shareData: ShareData) {
+        val intent = Intent(fragmentActivity,PostActivity::class.java)
+        intent.putExtra("data",shareData)
+        fragmentActivity.startActivity(intent)
+        Tool.startActivityInAnim(fragmentActivity,2)
     }
 
 }

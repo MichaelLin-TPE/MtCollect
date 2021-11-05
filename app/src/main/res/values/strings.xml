@@ -104,4 +104,5 @@
     <string name="title_remove_some_photo">請刪除照片後,再新增.</string>
     <string name="title_post_empty_info">無任何貼文唷~*</string>
     <string name="title_goal_empty_info">無任何登頂紀錄~*</string>
+    <string name="title_share_info">貼文</string>
 </resources>

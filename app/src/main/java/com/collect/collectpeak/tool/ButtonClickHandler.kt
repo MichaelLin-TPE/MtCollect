@@ -5,6 +5,7 @@ import com.collect.collectpeak.fragment.equipment.EquipmentListViewModel
 import com.collect.collectpeak.fragment.member.MemberViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDetailViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditViewModel
+import com.collect.collectpeak.fragment.member.page_fragment.post_detail.PostDetailViewModel
 import com.collect.collectpeak.fragment.mountain.mt_list.MtViewModel
 
 /**
@@ -94,6 +95,10 @@ class ButtonClickHandler<T>(private val viewModel:T) {
             return
         }
         if(viewModel is GoalEditViewModel){
+            viewModel.onBackButtonClickListener()
+            return
+        }
+        if(viewModel is PostDetailViewModel){
             viewModel.onBackButtonClickListener()
         }
     }
