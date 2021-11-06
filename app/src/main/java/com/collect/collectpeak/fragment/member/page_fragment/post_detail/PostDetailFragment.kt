@@ -2,7 +2,6 @@ package com.collect.collectpeak.fragment.member.page_fragment.post_detail
 
 import android.content.Context
 import android.os.Bundle
-import android.os.SharedMemory
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +9,20 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentPostDetailBinding
+import com.collect.collectpeak.dialog.ConfirmDialog
+import com.collect.collectpeak.dialog.GoalSettingDialog
+import com.collect.collectpeak.fragment.mountain.mt_list.MtFragment
 import com.collect.collectpeak.fragment.share.ShareData
+import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.ButtonClickHandler
 import com.collect.collectpeak.tool.Tool
 
 
-class PostDetailFragment : Fragment() {
+class PostDetailFragment : MtCollectorFragment() {
 
     private lateinit var dataBinding : FragmentPostDetailBinding
 
@@ -59,21 +64,83 @@ class PostDetailFragment : Fragment() {
 
     private fun initView(root: View) {
 
+        dataBinding.postDetailRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
+
         viewModel.setOnBackButtonClickEventCallBackListener{
             fragmentActivity.finish()
             Tool.startActivityOutAnim(fragmentActivity,2)
         }
+
+        //處理點擊事件的 interface
+        viewModel.setOnPostDetailClickEventListener(object : OnPostDetailClickEventListener{
+            override fun onClickSetting(shareData: ShareData) {
+                showSettingDialog(shareData)
+            }
+
+            override fun onShowConfirmDeleteDialog(shareData: ShareData) {
+                showConfirmDialog(fragmentActivity.supportFragmentManager,"確定要移除此筆貼文?",object : ConfirmDialog.OnConfirmDialogClickListener{
+                    override fun onConfirm() {
+                        viewModel.onDeletePostConfirmListener(shareData)
+                    }
+
+                    override fun onCancel() {
+
+                    }
+
+                })
+            }
+
+            override fun onShowProgressDialog() {
+                showProgressDialog(fragmentActivity.supportFragmentManager,"刪除中")
+            }
+
+            override fun onDismissProgressDialog() {
+                dismissProgressDialog()
+            }
+
+        })
+
+    }
+
+    private fun showSettingDialog(shareData: ShareData) {
+       val dialog = GoalSettingDialog.instance
+        dialog.showDialog(dataBinding.postDetailMask,dataBinding.root,fragmentActivity)
+        dialog.setOnSettingDialogItemClickListener(object : GoalSettingDialog.OnSettingDialogItemClickListener{
+            override fun onEditClick() {
+
+            }
+
+            override fun onDeleteClick() {
+                viewModel.onDeletePostClickListener(shareData)
+            }
+        })
 
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.onFragmentResume(targetShareData)
+        observerHandle()
+    }
+
+    private fun observerHandle() {
+        viewModel.showPostListLiveData.observe(this,{
+            MichaelLog.i("顯示貼文")
+            val adapter = PostAdapter()
+
+            adapter.setData(it)
+
+            dataBinding.postDetailRecyclerView.adapter = adapter
+
+            adapter.setOnPostDetailClickListener(object : PostAdapter.OnPostDetailClickListener{
+                override fun onSettingClick(shareData: ShareData) {
+                    viewModel.onSettingClickListener(shareData)
+                }
+            })
+        })
     }
 
     companion object {
-
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(data:ShareData) =
             PostDetailFragment().apply {

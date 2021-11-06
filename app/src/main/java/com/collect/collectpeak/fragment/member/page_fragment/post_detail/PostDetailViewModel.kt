@@ -14,7 +14,15 @@ class PostDetailViewModel : ViewModel() {
 
     private lateinit var onBackButtonClickEventCallBackListener: OnBackButtonClickEventCallBackListener
 
+    private lateinit var onPostDetailClickEventListener: OnPostDetailClickEventListener
+
     val showPostListLiveData = MutableLiveData<ArrayList<ShareData>>()
+
+    private val allPostData = ArrayList<ShareData>()
+
+    fun setOnPostDetailClickEventListener(onPostDetailClickEventListener: OnPostDetailClickEventListener){
+        this.onPostDetailClickEventListener = onPostDetailClickEventListener
+    }
 
     fun setOnBackButtonClickEventCallBackListener(onBackButtonClickEventCallBackListener: OnBackButtonClickEventCallBackListener){
         this.onBackButtonClickEventCallBackListener = onBackButtonClickEventCallBackListener
@@ -31,19 +39,49 @@ class PostDetailViewModel : ViewModel() {
                 MichaelLog.i("取得貼文成功：${data.size}")
                 val iterator = data.iterator()
                 while (iterator.hasNext()){
-
                     val shareData = iterator.next()
-
-                    if (!shareData.equals(AuthHandler.getCurrentUser()?.uid)){
+                    if (shareData.uid != AuthHandler.getCurrentUser()?.uid){
                         iterator.remove()
                     }
                 }
+                allPostData.addAll(data)
                 showPostListLiveData.value = data
 
             }
 
             override fun onCatchDataFail() {
                 MichaelLog.i("取得貼文失敗")
+            }
+
+        })
+
+    }
+
+    fun onSettingClickListener(shareData: ShareData) {
+        onPostDetailClickEventListener.onClickSetting(shareData)
+    }
+
+    fun onDeletePostClickListener(shareData: ShareData) {
+        onPostDetailClickEventListener.onShowConfirmDeleteDialog(shareData)
+    }
+
+    fun onDeletePostConfirmListener(shareData: ShareData) {
+        onPostDetailClickEventListener.onShowProgressDialog()
+
+        FireStoreHandler.getInstance().removeShareData(shareData,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
+            override fun onCatchDataSuccess(data: Unit) {
+                onPostDetailClickEventListener.onDismissProgressDialog()
+                for (allData in allPostData){
+                    if(allData.shareId == shareData.shareId){
+                        allPostData.remove(allData)
+                        break
+                    }
+                }
+                showPostListLiveData.value = allPostData
+            }
+
+            override fun onCatchDataFail() {
+                onPostDetailClickEventListener.onDismissProgressDialog()
             }
 
         })

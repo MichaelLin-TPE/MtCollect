@@ -13,6 +13,8 @@ class ShareData() : Parcelable{
 
     var likeCount = 0
 
+    var likeArray = ArrayList<LikeData>()
+
     var messageCount = 0
 
     var messageArray = ArrayList<MessageData>()

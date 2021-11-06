@@ -1324,6 +1324,125 @@ class FireStoreHandler {
             }
     }
 
+    fun getUserName(uid: String, onFireStoreCatchDataListener: OnFireStoreCatchDataListener<String>) {
+
+        val documentReference = firestore.collection(USER).document(USER_LIST)
+
+        documentReference.addSnapshotListener { value, error ->
+
+            if (error != null) {
+
+                onFireStoreCatchDataListener.onCatchDataFail()
+                MichaelLog.i("錯誤 無法取的使用者資料")
+                return@addSnapshotListener
+            }
+
+            if (value != null && value.exists()) {
+
+                val json = value.get("user_json") as String
+
+                if (json.isEmpty()) {
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addSnapshotListener
+                }
+                val userList = Gson().fromJson<ArrayList<MemberData>>(
+                    json,
+                    object : TypeToken<ArrayList<MemberData>>() {}.type
+                )
+
+                if (userList.isNullOrEmpty()) {
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addSnapshotListener
+                }
+
+                userList.forEach {
+                    if (it.userId == uid){
+                        onFireStoreCatchDataListener.onCatchDataSuccess(it.name)
+                        return@forEach
+                    }
+                }
+            }
+
+
+        }
+
+
+    }
+
+    fun getUserPhotoUrl(
+        uid: String,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<String>
+    ) {
+        firestore.collection(USER_PHOTO)
+            .document(uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful || task.result == null) {
+
+                    MichaelLog.i("取得照片網址失敗")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+                    MichaelLog.i("取得照片網址失敗：snapshot")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addOnCompleteListener
+                }
+
+                val photoUrl = snapshot.data?.get("photo") as String
+                onFireStoreCatchDataListener.onCatchDataSuccess(photoUrl)
+
+            }
+    }
+
+    fun removeShareData(shareData: ShareData, onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>) {
+        StorageHandler.removePhoto(shareData.photoArray)
+        firestore.collection(USER_POST_DATA)
+            .document("data")
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful && task.result == null) {
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+
+                    MichaelLog.i("沒有分享資料 snapshot is null 建立新的一筆新的")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val shareArray = Gson().fromJson<ArrayList<ShareData>>(
+                    json,
+                    object : TypeToken<ArrayList<ShareData>>() {}.type
+                )
+                if (shareArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有分享資料 data is null")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+
+                    return@addOnCompleteListener
+                }
+
+                for (data in shareArray){
+                    if (data.shareId == shareData.shareId){
+                        shareArray.remove(data)
+                        break
+                    }
+                }
+                saveShareData(shareArray,onFireStoreCatchDataListener)
+
+            }
+    }
+
 
     interface OnCheckUserExistResultListener {
         fun onUserExist()
