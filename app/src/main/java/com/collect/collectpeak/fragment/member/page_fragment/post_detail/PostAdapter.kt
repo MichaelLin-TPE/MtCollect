@@ -161,6 +161,9 @@ class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         return@forEach
                     }
                 }
+            }else{
+                tvHeartCount.visibility = View.GONE
+                ivHeart.setImageResource(R.drawable.heart_not_press)
             }
             if (shareData.messageCount != 0){
                 centerLine.visibility = View.VISIBLE
@@ -172,6 +175,10 @@ class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 onPostDetailClickListener.onSettingClick(shareData)
             }
 
+            ivHeart.setOnClickListener {
+
+                onPostDetailClickListener.onHeartIconClick(shareData)
+            }
 
         }
 
@@ -188,6 +195,8 @@ class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnPostDetailClickListener{
         fun onSettingClick(shareData: ShareData)
+
+        fun onHeartIconClick(shareData: ShareData)
     }
 
 }

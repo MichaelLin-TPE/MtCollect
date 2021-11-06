@@ -1443,6 +1443,53 @@ class FireStoreHandler {
             }
     }
 
+    fun editPostData(
+        shareData: ShareData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        firestore.collection(USER_POST_DATA)
+            .document("data")
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful && task.result == null) {
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+
+                    MichaelLog.i("沒有分享資料 snapshot is null 建立新的一筆新的")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val shareArray = Gson().fromJson<ArrayList<ShareData>>(
+                    json,
+                    object : TypeToken<ArrayList<ShareData>>() {}.type
+                )
+                if (shareArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有分享資料 data is null")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+
+                    return@addOnCompleteListener
+                }
+
+                for ((index,data) in shareArray.withIndex()){
+                    if (data.shareId == shareData.shareId){
+                        shareArray[index] = shareData
+                        break
+                    }
+                }
+                saveShareData(shareArray,onFireStoreCatchDataListener)
+
+            }
+    }
+
 
     interface OnCheckUserExistResultListener {
         fun onUserExist()

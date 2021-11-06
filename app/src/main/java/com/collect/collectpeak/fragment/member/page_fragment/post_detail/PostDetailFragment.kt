@@ -28,6 +28,8 @@ class PostDetailFragment : MtCollectorFragment() {
 
     private lateinit var targetShareData: ShareData
 
+    private val adapter = PostAdapter()
+
     private val viewModel : PostDetailViewModel by activityViewModels {
         PostDetailViewModel.PostDetailFactory()
     }
@@ -40,6 +42,16 @@ class PostDetailFragment : MtCollectorFragment() {
     }
 
 
+    companion object {
+        @JvmStatic
+        fun newInstance(data:ShareData) =
+            PostDetailFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable("data",data)
+                }
+            }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -50,7 +62,7 @@ class PostDetailFragment : MtCollectorFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         dataBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_post_detail,container,false)
         dataBinding.vm = viewModel
@@ -107,7 +119,7 @@ class PostDetailFragment : MtCollectorFragment() {
         dialog.showDialog(dataBinding.postDetailMask,dataBinding.root,fragmentActivity)
         dialog.setOnSettingDialogItemClickListener(object : GoalSettingDialog.OnSettingDialogItemClickListener{
             override fun onEditClick() {
-
+                viewModel.onEditPostDataClickListener(shareData)
             }
 
             override fun onDeleteClick() {
@@ -126,7 +138,6 @@ class PostDetailFragment : MtCollectorFragment() {
     private fun observerHandle() {
         viewModel.showPostListLiveData.observe(this,{
             MichaelLog.i("顯示貼文")
-            val adapter = PostAdapter()
 
             adapter.setData(it)
 
@@ -136,17 +147,18 @@ class PostDetailFragment : MtCollectorFragment() {
                 override fun onSettingClick(shareData: ShareData) {
                     viewModel.onSettingClickListener(shareData)
                 }
+
+                override fun onHeartIconClick(shareData: ShareData) {
+                    viewModel.onHeartIconClickListener(shareData)
+                }
             })
+        })
+
+        viewModel.updatePostListLiveData.observe(this,{
+            adapter.setData(it)
+            adapter.notifyDataSetChanged()
         })
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(data:ShareData) =
-            PostDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable("data",data)
-                }
-            }
-    }
+
 }
