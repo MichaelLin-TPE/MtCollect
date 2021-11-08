@@ -38,6 +38,8 @@ class FireStoreHandler {
 
     private var originalSummitData: SummitData = SummitData()
 
+    private var originalShareData : ShareData = ShareData()
+
     companion object {
 
         private val instance = FireStoreHandler()
@@ -1130,8 +1132,19 @@ class FireStoreHandler {
 
                     return@addOnCompleteListener
                 }
-                shareArray.add(data)
-                saveShareData(shareArray, onFireStoreCatchDataListener)
+
+                var isFoundSameData = false
+                for((index, shareData) in shareArray.withIndex()){
+                    if (shareData.shareId == data.shareId){
+                        shareArray[index] = data
+                        isFoundSameData = true
+                        break
+                    }
+                }
+                if (!isFoundSameData){
+                    shareArray.add(data)
+                }
+                saveShareData(shareArray,onFireStoreCatchDataListener)
 
 
             }
@@ -1488,6 +1501,75 @@ class FireStoreHandler {
                 saveShareData(shareArray,onFireStoreCatchDataListener)
 
             }
+    }
+
+    fun saveUserEditShareData(
+        goalEditData: GoalEditData,
+        targetShareData: ShareData,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
+    ) {
+        this.onFireStoreCatchDataListener = onFireStoreCatchDataListener
+
+        Thread{
+            deletePhotoArray.clear()
+
+            targetShareData.photoArray.forEach { ori ->
+                var isFoundSamePhoto = false
+                goalEditData.photoArray.forEach { new ->
+                    if (ori == new) {
+                        isFoundSamePhoto = true
+                    }
+                }
+                if (!isFoundSamePhoto) {
+                    deletePhotoArray.add(ori)
+                }
+            }
+
+            this.originalShareData.photoArray = goalEditData.photoArray
+            this.originalShareData.content = targetShareData.content
+            this.originalShareData.likeArray = targetShareData.likeArray
+            this.originalShareData.shareId = targetShareData.shareId
+            this.originalShareData.uid = targetShareData.uid
+            this.originalShareData.likeCount = targetShareData.likeCount
+            this.originalShareData.messageArray = targetShareData.messageArray
+            this.originalShareData.messageCount = targetShareData.messageCount
+            this.originalShareData.type = targetShareData.type
+
+            if (deletePhotoArray.isEmpty() && goalEditData.newPhotoArray.isEmpty()) {
+                setUserPostData(originalShareData, onFireStoreCatchDataListener)
+                return@Thread
+            }
+
+            if (deletePhotoArray.isNotEmpty()) {
+                startToDeletePhoto()
+            }
+
+            if (goalEditData.newPhotoArray.isEmpty()){
+                setUserPostData(originalShareData,onFireStoreCatchDataListener)
+                return@Thread
+            }
+
+            if (goalEditData.newPhotoArray.isNotEmpty()){
+                newPeakPhotoArray.addAll(goalEditData.newPhotoArray)
+                uploadPhotoCount = 0
+                startToUpLoadSharePhoto()
+            }
+        }.start()
+    }
+
+    private fun startToUpLoadSharePhoto() {
+        if(uploadPhotoCount < newPeakPhotoArray.size){
+            StorageHandler.uploadPeakPhoto(StorageHandler.getByteArray(newPeakPhotoArray[uploadPhotoCount]),object : StorageHandler.OnCatchUploadPhotoUrlListener{
+                override fun onCatchPhoto(url: String) {
+                    originalShareData.photoArray.add(url)
+                    uploadPhotoCount ++
+                    startToUpLoadSharePhoto()
+                }
+            })
+        }else{
+            setUserPostData(originalShareData,onFireStoreCatchDataListener)
+            uploadPhotoCount = 0
+        }
     }
 
 

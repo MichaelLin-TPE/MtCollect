@@ -6,6 +6,7 @@ import com.collect.collectpeak.fragment.member.MemberViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDetailViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.post_detail.PostDetailViewModel
+import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditViewModel
 import com.collect.collectpeak.fragment.mountain.mt_list.MtViewModel
 
 /**
@@ -31,6 +32,15 @@ class ButtonClickHandler<T>(private val viewModel:T) {
        if (viewModel is GoalEditViewModel){
            viewModel.onEditMtListClickListener(view)
        }
+    }
+
+    /**
+     * 編輯貼貼文葉面 編成完成點擊事件
+     */
+    fun onEditPostDataDoneButtonClickListener(view: View){
+        if (viewModel is PostEditViewModel){
+            viewModel.onDoneButtonClickListener()
+        }
     }
 
     /**
@@ -99,6 +109,10 @@ class ButtonClickHandler<T>(private val viewModel:T) {
             return
         }
         if(viewModel is PostDetailViewModel){
+            viewModel.onBackButtonClickListener()
+            return
+        }
+        if (viewModel is PostEditViewModel){
             viewModel.onBackButtonClickListener()
         }
     }

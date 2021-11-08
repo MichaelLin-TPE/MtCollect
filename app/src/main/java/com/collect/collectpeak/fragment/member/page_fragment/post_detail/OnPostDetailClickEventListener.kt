@@ -12,4 +12,6 @@ interface OnPostDetailClickEventListener {
 
     fun onDismissProgressDialog()
 
+    fun onGotoPostEditPage(shareData: ShareData)
+
 }

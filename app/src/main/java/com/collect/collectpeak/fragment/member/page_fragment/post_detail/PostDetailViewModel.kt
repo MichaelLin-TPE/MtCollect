@@ -21,6 +21,8 @@ class PostDetailViewModel : ViewModel() {
 
     val updatePostListLiveData = MutableLiveData<ArrayList<ShareData>>()
 
+    val scrollToListPositionLiveData = MutableLiveData<Int>()
+
     private val allPostData = ArrayList<ShareData>()
 
     fun setOnPostDetailClickEventListener(onPostDetailClickEventListener: OnPostDetailClickEventListener) {
@@ -41,6 +43,7 @@ class PostDetailViewModel : ViewModel() {
             FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<ShareData>> {
             override fun onCatchDataSuccess(data: ArrayList<ShareData>) {
                 MichaelLog.i("取得貼文成功：${data.size}")
+                allPostData.clear()
                 val iterator = data.iterator()
                 while (iterator.hasNext()) {
                     val shareData = iterator.next()
@@ -51,6 +54,8 @@ class PostDetailViewModel : ViewModel() {
                 allPostData.addAll(data)
                 showPostListLiveData.value = data
 
+                scrollToListPosition(targetShareData)
+
             }
 
             override fun onCatchDataFail() {
@@ -59,6 +64,15 @@ class PostDetailViewModel : ViewModel() {
 
         })
 
+    }
+
+    private fun scrollToListPosition(targetShareData: ShareData) {
+        for ((index,data) in allPostData.withIndex()){
+            if (targetShareData.shareId == data.shareId){
+                scrollToListPositionLiveData.value = index
+                break
+            }
+        }
     }
 
     fun onSettingClickListener(shareData: ShareData) {
@@ -74,7 +88,9 @@ class PostDetailViewModel : ViewModel() {
 
         FireStoreHandler.getInstance().removeShareData(shareData,
             object : FireStoreHandler.OnFireStoreCatchDataListener<Unit> {
-                override fun onCatchDataSuccess(data: Unit) {
+                override fun onCatchDataSuccess(
+                    data: Unit
+                ) {
                     onPostDetailClickEventListener.onDismissProgressDialog()
                     for (allData in allPostData) {
                         if (allData.shareId == shareData.shareId) {
@@ -94,7 +110,7 @@ class PostDetailViewModel : ViewModel() {
     }
 
     fun onEditPostDataClickListener(shareData: ShareData) {
-
+        onPostDetailClickEventListener.onGotoPostEditPage(shareData)
     }
 
 

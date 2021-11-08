@@ -15,22 +15,24 @@ import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentPostDetailBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.GoalSettingDialog
+import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditFragment
 import com.collect.collectpeak.fragment.mountain.mt_list.MtFragment
 import com.collect.collectpeak.fragment.share.ShareData
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.ButtonClickHandler
+import com.collect.collectpeak.tool.FragmentUtil
 import com.collect.collectpeak.tool.Tool
 
 
 class PostDetailFragment : MtCollectorFragment() {
 
-    private lateinit var dataBinding : FragmentPostDetailBinding
+    private lateinit var dataBinding: FragmentPostDetailBinding
 
     private lateinit var targetShareData: ShareData
 
     private val adapter = PostAdapter()
 
-    private val viewModel : PostDetailViewModel by activityViewModels {
+    private val viewModel: PostDetailViewModel by activityViewModels {
         PostDetailViewModel.PostDetailFactory()
     }
 
@@ -44,10 +46,10 @@ class PostDetailFragment : MtCollectorFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(data:ShareData) =
+        fun newInstance(data: ShareData) =
             PostDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable("data",data)
+                    putParcelable("data", data)
                 }
             }
     }
@@ -64,7 +66,8 @@ class PostDetailFragment : MtCollectorFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        dataBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_post_detail,container,false)
+        dataBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_post_detail, container, false)
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
         dataBinding.clickListener = ButtonClickHandler(viewModel)
@@ -78,36 +81,50 @@ class PostDetailFragment : MtCollectorFragment() {
 
         dataBinding.postDetailRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
 
-        viewModel.setOnBackButtonClickEventCallBackListener{
+        viewModel.setOnBackButtonClickEventCallBackListener {
             fragmentActivity.finish()
-            Tool.startActivityOutAnim(fragmentActivity,2)
+            Tool.startActivityOutAnim(fragmentActivity, 2)
         }
 
         //處理點擊事件的 interface
-        viewModel.setOnPostDetailClickEventListener(object : OnPostDetailClickEventListener{
+        viewModel.setOnPostDetailClickEventListener(object : OnPostDetailClickEventListener {
             override fun onClickSetting(shareData: ShareData) {
                 showSettingDialog(shareData)
             }
 
             override fun onShowConfirmDeleteDialog(shareData: ShareData) {
-                showConfirmDialog(fragmentActivity.supportFragmentManager,"確定要移除此筆貼文?",object : ConfirmDialog.OnConfirmDialogClickListener{
-                    override fun onConfirm() {
-                        viewModel.onDeletePostConfirmListener(shareData)
-                    }
+                showConfirmDialog(
+                    fragmentActivity.supportFragmentManager,
+                    "確定要移除此筆貼文?",
+                    object : ConfirmDialog.OnConfirmDialogClickListener {
+                        override fun onConfirm() {
+                            viewModel.onDeletePostConfirmListener(shareData)
+                        }
 
-                    override fun onCancel() {
+                        override fun onCancel() {
 
-                    }
+                        }
 
-                })
+                    })
             }
 
             override fun onShowProgressDialog() {
-                showProgressDialog(fragmentActivity.supportFragmentManager,"刪除中")
+                showProgressDialog(fragmentActivity.supportFragmentManager, "刪除中")
             }
 
             override fun onDismissProgressDialog() {
                 dismissProgressDialog()
+            }
+
+            override fun onGotoPostEditPage(shareData: ShareData) {
+                FragmentUtil.replace(
+                    R.id.container,
+                    fragmentActivity.supportFragmentManager,
+                    PostEditFragment.newInstance(shareData),
+                    true,
+                    PostEditFragment.javaClass.simpleName,
+                    1
+                )
             }
 
         })
@@ -115,9 +132,10 @@ class PostDetailFragment : MtCollectorFragment() {
     }
 
     private fun showSettingDialog(shareData: ShareData) {
-       val dialog = GoalSettingDialog.instance
-        dialog.showDialog(dataBinding.postDetailMask,dataBinding.root,fragmentActivity)
-        dialog.setOnSettingDialogItemClickListener(object : GoalSettingDialog.OnSettingDialogItemClickListener{
+        val dialog = GoalSettingDialog.instance
+        dialog.showDialog(dataBinding.postDetailMask, dataBinding.root, fragmentActivity)
+        dialog.setOnSettingDialogItemClickListener(object :
+            GoalSettingDialog.OnSettingDialogItemClickListener {
             override fun onEditClick() {
                 viewModel.onEditPostDataClickListener(shareData)
             }
@@ -136,14 +154,14 @@ class PostDetailFragment : MtCollectorFragment() {
     }
 
     private fun observerHandle() {
-        viewModel.showPostListLiveData.observe(this,{
+        viewModel.showPostListLiveData.observe(this, {
             MichaelLog.i("顯示貼文")
 
             adapter.setData(it)
 
             dataBinding.postDetailRecyclerView.adapter = adapter
 
-            adapter.setOnPostDetailClickListener(object : PostAdapter.OnPostDetailClickListener{
+            adapter.setOnPostDetailClickListener(object : PostAdapter.OnPostDetailClickListener {
                 override fun onSettingClick(shareData: ShareData) {
                     viewModel.onSettingClickListener(shareData)
                 }
@@ -154,7 +172,11 @@ class PostDetailFragment : MtCollectorFragment() {
             })
         })
 
-        viewModel.updatePostListLiveData.observe(this,{
+        viewModel.scrollToListPositionLiveData.observe(this,{
+            dataBinding.postDetailRecyclerView.scrollToPosition(it)
+        })
+
+        viewModel.updatePostListLiveData.observe(this, {
             adapter.setData(it)
             adapter.notifyDataSetChanged()
         })
