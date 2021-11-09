@@ -20,6 +20,10 @@ import java.util.*
 
 class MainFrameActivity : MtCollectorActivity() {
 
+    companion object {
+        const val GO_SELF_PAGE = 0
+    }
+
     private lateinit var dataBinding: ActivityHomeBinding
 
     private val viewModel: MainFrameViewModel by viewModels {
@@ -27,6 +31,15 @@ class MainFrameActivity : MtCollectorActivity() {
         MainFrameViewModel.HomeViewModelFactory(homeRepository)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        MichaelLog.i("onNewIntent 有收到東西")
+
+        val type = intent?.getIntExtra("type", GO_SELF_PAGE)
+
+        viewModel.onCatchTypeByNewIntent(type)
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,8 +64,16 @@ class MainFrameActivity : MtCollectorActivity() {
         viewModel.onActivityCreate()
 
         observerFunction()
+    }
 
+    override fun onResume() {
+        super.onResume()
 
+        viewModel.setOnNewIntentListener(object : MainFrameViewModel.OnNewIntentListener {
+            override fun onGoToSelfPage() {
+                dataBinding.homeTabLayout.getTabAt(4)?.select()
+            }
+        })
     }
 
     private fun observerFunction() {

@@ -8,6 +8,7 @@ import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditV
 import com.collect.collectpeak.fragment.member.page_fragment.post_detail.PostDetailViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditViewModel
 import com.collect.collectpeak.fragment.mountain.mt_list.MtViewModel
+import com.collect.collectpeak.fragment.user_page.UserPageViewModel
 
 /**
  * 利用 DataBinding 來實作所有的 ClickListener
@@ -115,6 +116,10 @@ class ButtonClickHandler<T>(private val viewModel:T) {
         if (viewModel is PostEditViewModel){
             viewModel.onBackButtonClickListener()
         }
+        if(viewModel is UserPageViewModel){
+            viewModel.onBackPressClickListener()
+        }
+
     }
 
 

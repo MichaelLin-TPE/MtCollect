@@ -3,7 +3,6 @@ package com.collect.collectpeak.fragment.member.page_fragment.goal
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.activity.GoalActivity
@@ -27,6 +25,8 @@ class GoalFragment : MtCollectorFragment() {
 
     private lateinit var dataBinding : FragmentGoalBinding
 
+    private var uid = ""
+
     private val viewModel : GoalViewModel by activityViewModels {
         GoalViewModel.GoalFactory()
     }
@@ -38,10 +38,10 @@ class GoalFragment : MtCollectorFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(uid: String) =
             GoalFragment().apply {
                 arguments = Bundle().apply {
-
+                    putString("uid",uid)
                 }
             }
     }
@@ -49,12 +49,13 @@ class GoalFragment : MtCollectorFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
+            uid = it.getString("uid","")
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.onFragmentResume()
+        viewModel.onFragmentResume(uid)
         observerHandle()
     }
 

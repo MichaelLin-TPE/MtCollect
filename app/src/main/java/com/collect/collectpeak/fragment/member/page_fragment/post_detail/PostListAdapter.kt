@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PostListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val POST_LIST = 0;
@@ -93,6 +93,10 @@ class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val centerLine : View = itemView.findViewById(R.id.center_line)
 
         private val tvContent : TextView = itemView.findViewById(R.id.post_content)
+
+        private val photoClick : View = itemView.findViewById(R.id.post_photo_click_area)
+
+        private val settingClick : View = itemView.findViewById(R.id.post_setting_click_are)
 
         private lateinit var onPostDetailClickListener: OnPostDetailClickListener
 
@@ -171,7 +175,11 @@ class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 tvMessageCount.text = String.format(Locale.getDefault(),"%d則留言",shareData.messageCount)
             }
 
-            ivSetting.setOnClickListener {
+            photoClick.setOnClickListener {
+                onPostDetailClickListener.onPhotoClick(shareData.uid)
+            }
+
+            settingClick.setOnClickListener {
                 onPostDetailClickListener.onSettingClick(shareData)
             }
 
@@ -194,9 +202,12 @@ class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
     interface OnPostDetailClickListener{
+
         fun onSettingClick(shareData: ShareData)
 
         fun onHeartIconClick(shareData: ShareData)
+
+        fun onPhotoClick(uid : String)
     }
 
 }

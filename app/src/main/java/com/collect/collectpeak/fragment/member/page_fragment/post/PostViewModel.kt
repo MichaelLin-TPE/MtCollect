@@ -13,11 +13,19 @@ class PostViewModel : ViewModel() {
 
     val showDefaultView = MutableLiveData(true)
 
-    fun onFragmentResume() {
+    fun onFragmentResume(uid : String) {
         FireStoreHandler.getInstance().getUserPostData(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<ShareData>>{
             override fun onCatchDataSuccess(data: ArrayList<ShareData>) {
+
                 MichaelLog.i("取得貼文成功 : ${data.size}")
 
+                val iterator = data.iterator()
+                while (iterator.hasNext()){
+                    val shareData = iterator.next()
+                    if (shareData.uid != uid){
+                        iterator.remove()
+                    }
+                }
                 showPostListLiveData.value = data
 
                 showDefaultView.value = data.isEmpty()

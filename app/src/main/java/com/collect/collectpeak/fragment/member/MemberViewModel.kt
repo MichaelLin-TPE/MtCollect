@@ -63,9 +63,6 @@ class MemberViewModel(private val repository: MemberRepository) : ViewModel() {
 
         memberInfoViewLiveData.value = true
 
-
-
-
     }
 
     fun onPhotoSelectListener() {

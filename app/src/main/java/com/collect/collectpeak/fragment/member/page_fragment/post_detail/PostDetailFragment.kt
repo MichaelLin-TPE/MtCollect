@@ -2,7 +2,6 @@ package com.collect.collectpeak.fragment.member.page_fragment.post_detail
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import com.collect.collectpeak.databinding.FragmentPostDetailBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.GoalSettingDialog
 import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditFragment
-import com.collect.collectpeak.fragment.mountain.mt_list.MtFragment
 import com.collect.collectpeak.fragment.share.ShareData
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.ButtonClickHandler
@@ -30,7 +28,7 @@ class PostDetailFragment : MtCollectorFragment() {
 
     private lateinit var targetShareData: ShareData
 
-    private val adapter = PostAdapter()
+    private val adapter = PostListAdapter()
 
     private val viewModel: PostDetailViewModel by activityViewModels {
         PostDetailViewModel.PostDetailFactory()
@@ -161,13 +159,17 @@ class PostDetailFragment : MtCollectorFragment() {
 
             dataBinding.postDetailRecyclerView.adapter = adapter
 
-            adapter.setOnPostDetailClickListener(object : PostAdapter.OnPostDetailClickListener {
+            adapter.setOnPostDetailClickListener(object : PostListAdapter.OnPostDetailClickListener {
                 override fun onSettingClick(shareData: ShareData) {
                     viewModel.onSettingClickListener(shareData)
                 }
 
                 override fun onHeartIconClick(shareData: ShareData) {
                     viewModel.onHeartIconClickListener(shareData)
+                }
+
+                override fun onPhotoClick(uid: String) {
+
                 }
             })
         })

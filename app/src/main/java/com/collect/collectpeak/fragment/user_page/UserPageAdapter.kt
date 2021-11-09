@@ -1,4 +1,4 @@
-package com.collect.collectpeak.fragment.member
+package com.collect.collectpeak.fragment.user_page
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,15 +11,17 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.collect.collectpeak.MtCollectorApplication
 import com.collect.collectpeak.R
-import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.firebase.FireStoreHandler
+import com.collect.collectpeak.fragment.member.MemberBasicData
+import com.collect.collectpeak.fragment.member.MemberData
+import com.collect.collectpeak.fragment.member.MemberViewPagerAdapter
 import com.collect.collectpeak.fragment.member.page_fragment.post.PostFragment
 import com.collect.collectpeak.fragment.member.page_fragment.goal.GoalFragment
 import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.ImageLoaderHandler
 import com.google.android.material.tabs.TabLayout
 
-class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val MEMBER_INFO = 0
@@ -29,6 +31,12 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private lateinit var onMemberInfoClickListener: OnMemberInfoClickListener
 
     private lateinit var fragmentManager: FragmentManager
+
+    private var uid = ""
+
+    fun setUid(uid :String){
+        this.uid = uid
+    }
 
 
     fun setOnMemberInfoClickListener(onMemberInfoClickListener: OnMemberInfoClickListener) {
@@ -62,12 +70,12 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         if (holder is MemberInfoViewHolder) {
 
-            holder.showView()
+            holder.showView(uid)
             holder.setOnMemberInfoClickListener(onMemberInfoClickListener)
             return
         }
         if (holder is MemberPageViewHolder){
-            holder.showView(fragmentManager)
+            holder.showView(fragmentManager,uid)
 
         }
 
@@ -110,7 +118,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val tvDescription = itemView.findViewById<TextView>(R.id.member_post_description)
 
-        fun showView() {
+        fun showView(uid : String) {
             ivPhoto.setOnClickListener {
                 onMemberInfoClickListener.onPhotoSelectListener()
             }
@@ -119,7 +127,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 onMemberInfoClickListener.onEditUserProfileClickListener()
             }
 
-            FireStoreHandler.getInstance().getUserProfile(object : FireStoreHandler.OnFireStoreCatchDataListener<MemberData>{
+            FireStoreHandler.getInstance().getUserProfileByUid(uid,object : FireStoreHandler.OnFireStoreCatchDataListener<MemberData>{
                 override fun onCatchDataSuccess(data: MemberData) {
                     tvDescription.text = data.description
                     tvName.text = data.name
@@ -131,9 +139,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
             })
 
-
-
-            FireStoreHandler.getInstance().getPhotoUrl(object : FireStoreHandler.OnFireStoreCatchDataListener<String>{
+            FireStoreHandler.getInstance().getPhotoUrlByUid(uid,object : FireStoreHandler.OnFireStoreCatchDataListener<String>{
                 override fun onCatchDataSuccess(data: String) {
                     MichaelLog.i("取得網址成功")
                     if (data.isEmpty()){
@@ -149,7 +155,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
             })
 
-            FireStoreHandler.getInstance().getMemberBasicData(object : FireStoreHandler.OnFireStoreCatchDataListener<MemberBasicData>{
+            FireStoreHandler.getInstance().getMemberBasicDataByUid(uid,object : FireStoreHandler.OnFireStoreCatchDataListener<MemberBasicData>{
                 override fun onCatchDataSuccess(data: MemberBasicData) {
 
                     tvFriendCount.text = "朋友\n"
@@ -172,7 +178,7 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         }
 
-        fun setOnMemberInfoClickListener(onMemberInfoClickListener: MemberAdapter.OnMemberInfoClickListener) {
+        fun setOnMemberInfoClickListener(onMemberInfoClickListener: UserPageAdapter.OnMemberInfoClickListener) {
             this.onMemberInfoClickListener = onMemberInfoClickListener
         }
 
@@ -194,13 +200,11 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val root : ConstraintLayout = itemView.findViewById(R.id.member_page_root)
 
-        fun showView(fragmentManager: FragmentManager) {
+        fun showView(fragmentManager: FragmentManager, uid: String) {
 
 
 
             val transaction = fragmentManager.beginTransaction()
-
-            val uid = AuthHandler.getCurrentUser()?.uid ?: return
 
             transaction.replace(R.id.member_container, PostFragment.newInstance(uid))
             transaction.commit()
@@ -229,6 +233,9 @@ class MemberAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
 
+    /**
+     * 棄用 2021/11/09
+     */
     class MemberTypePageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val viewPager = itemView.findViewById<ViewPager>(R.id.member_type_view_pager)

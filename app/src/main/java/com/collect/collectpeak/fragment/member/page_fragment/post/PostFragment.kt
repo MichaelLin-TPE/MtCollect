@@ -22,6 +22,8 @@ class PostFragment : Fragment() {
 
     private lateinit var dataBinding : FragmentPostBinding
 
+    private var targetUid = ""
+
     private val viewModel : PostViewModel by activityViewModels {
         PostViewModel.PostFactory()
     }
@@ -36,10 +38,10 @@ class PostFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(uid:String) =
             PostFragment().apply {
                 arguments = Bundle().apply {
-
+                    putString("uid",uid)
                 }
             }
     }
@@ -47,7 +49,7 @@ class PostFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-
+            targetUid = it.getString("uid","")
         }
     }
 
@@ -71,7 +73,7 @@ class PostFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.onFragmentResume()
+        viewModel.onFragmentResume(targetUid)
         observerHandle()
     }
 

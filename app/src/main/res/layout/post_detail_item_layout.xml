@@ -15,9 +15,18 @@
         android:layout_marginTop="32dp"
         android:layout_marginStart="16dp"
         android:scaleType="centerCrop"
-        android:layout_width="30dp"
+        android:layout_width="40dp"
         android:visibility="visible"
-        android:layout_height="30dp"/>
+        android:layout_height="40dp"/>
+
+    <View
+        android:id="@+id/post_photo_click_area"
+        app:layout_constraintTop_toTopOf="@id/post_member_photo"
+        app:layout_constraintBottom_toBottomOf="@id/post_member_photo"
+        app:layout_constraintRight_toRightOf="@id/post_member_photo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
 
 
     <com.collect.collectpeak.custom_widget.CollectPeakTextView
@@ -86,6 +95,15 @@
         android:layout_marginTop="10dp"
         android:layout_width="20dp"
         android:layout_height="20dp"/>
+
+    <View
+        android:id="@+id/post_setting_click_are"
+        app:layout_constraintTop_toTopOf="@id/post_setting"
+        app:layout_constraintBottom_toTopOf="@id/post_view_pager"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/post_setting"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
 
     <com.collect.collectpeak.custom_widget.CollectPeakTextView
         android:id="@+id/post_heart_count"

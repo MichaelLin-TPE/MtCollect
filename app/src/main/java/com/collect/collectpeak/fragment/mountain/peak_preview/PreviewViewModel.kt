@@ -10,6 +10,7 @@ import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.StorageHandler
 import com.collect.collectpeak.fragment.mountain.peak_time.MtPeakData
 import com.collect.collectpeak.fragment.share.ShareData
+import com.collect.collectpeak.fragment.share.ShareFragment.Companion.NORMAL_POST
 import com.collect.collectpeak.fragment.share.ShareFragment.Companion.PEAK_DATA
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
@@ -142,9 +143,9 @@ class PreviewViewModel : ViewModel() {
 
         val data = ShareData()
 
-        data.content = "${mtPeakData.mtName},${mtPeakData.level},${mtPeakData.time},${mtPeakData.description}"
+        data.content = "${getTime(mtPeakData.time)}, 登頂：${mtPeakData.mtName}  ${mtPeakData.level}\n${mtPeakData.description}"
 
-        data.type = PEAK_DATA
+        data.type = NORMAL_POST
 
         data.uid = AuthHandler.getCurrentUser()?.uid ?: return
 
@@ -168,6 +169,10 @@ class PreviewViewModel : ViewModel() {
 
 
 
+    }
+
+    private fun getTime(time: Long): String {
+        return SimpleDateFormat("yyyy/MM/dd",Locale.getDefault()).format(Date(time))
     }
 
     private fun getByteArray (bitmap: Bitmap) : ByteArray{

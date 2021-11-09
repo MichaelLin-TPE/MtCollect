@@ -11,8 +11,8 @@ class GoalViewModel : ViewModel() {
 
     val showEmptyViewLiveData = MutableLiveData(true)
 
-    fun onFragmentResume() {
-        FireStoreHandler.getInstance().getUserSummitData(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<SummitData>>{
+    fun onFragmentResume(uid: String) {
+        FireStoreHandler.getInstance().getUserSummitDataByUid(uid,object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<SummitData>>{
             override fun onCatchDataSuccess(data: ArrayList<SummitData>) {
 
                 if (data.isEmpty()){
@@ -21,7 +21,6 @@ class GoalViewModel : ViewModel() {
                 }
                 showEmptyViewLiveData.value = false
                 summitArrayLiveData.value = data
-
 
             }
 

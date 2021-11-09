@@ -17,8 +17,8 @@ class MemberViewPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm
         MichaelLog.i("fragment position : $position")
 
         return when(position){
-            0 -> PostFragment.newInstance()
-            else -> GoalFragment.newInstance()
+            0 -> PostFragment.newInstance("")
+            else -> GoalFragment.newInstance("uid")
         }
     }
 
