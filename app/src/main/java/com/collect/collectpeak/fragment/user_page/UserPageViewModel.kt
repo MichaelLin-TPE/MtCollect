@@ -19,6 +19,8 @@ class UserPageViewModel : ViewModel() {
 
     val updateFollowButtonLiveData = MutableLiveData<JSONObject>()
 
+    private var targetChatId = ""
+
     fun setOnUserPageClickEventListener(onUserPageClickEventListener: OnUserPageClickEventListener){
         this.onUserPageClickEventListener = onUserPageClickEventListener
     }
@@ -55,7 +57,16 @@ class UserPageViewModel : ViewModel() {
         })
 
         MichaelLog.i("檢查是否有聊天室")
-        FireStoreHandler.getInstance().createChatRoom(targetUid)
+        FireStoreHandler.getInstance().createChatRoom(targetUid,object : FireStoreHandler.OnFireStoreCatchDataListener<String>{
+            override fun onCatchDataSuccess(data: String) {
+               targetChatId = data
+            }
+
+            override fun onCatchDataFail() {
+
+            }
+
+        })
 
 
     }
@@ -87,9 +98,9 @@ class UserPageViewModel : ViewModel() {
         return jsonObject
     }
 
-    fun onMessageClickListener(targetUid: String) {
+    fun onMessageClickListener() {
 
-        onUserPageClickEventListener.onGoToUserChatPage(targetUid)
+        onUserPageClickEventListener.onGoToUserChatPage(targetChatId)
 
     }
 

@@ -10,5 +10,5 @@ interface OnUserPageClickEventListener {
 
     fun onShowToast(content:String)
 
-    fun onGoToUserChatPage(targetUid :String)
+    fun onGoToUserChatPage(targetChatId: String)
 }

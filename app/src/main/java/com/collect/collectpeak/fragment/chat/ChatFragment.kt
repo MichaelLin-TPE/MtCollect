@@ -17,8 +17,7 @@ import com.collect.collectpeak.tool.ButtonClickHandler
 class ChatFragment : MtCollectorFragment() {
 
     private lateinit var dataBinding: FragmentChatBinding
-
-    private var targetUid = ""
+    private var targetChatId = ""
 
     private val viewModel: ChatViewModel by activityViewModels {
         ChatViewModel.ChatFactory()
@@ -29,10 +28,10 @@ class ChatFragment : MtCollectorFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(targetUid: String) =
+        fun newInstance(targetChatId: String) =
             ChatFragment().apply {
                 arguments = Bundle().apply {
-                    putString("uid", targetUid)
+                    putString("chatId",targetChatId)
                 }
             }
     }
@@ -45,13 +44,13 @@ class ChatFragment : MtCollectorFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            targetUid = it.getString("uid","")
+            targetChatId = it.getString("chatId","")
         }
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.onFragmentStart(targetUid)
+        viewModel.onFragmentStart(targetChatId)
     }
 
     override fun onCreateView(

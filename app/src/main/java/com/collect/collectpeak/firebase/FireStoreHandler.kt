@@ -22,8 +22,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.function.Consumer
-import java.util.logging.StreamHandler
 
 class FireStoreHandler {
 
@@ -1932,7 +1930,7 @@ class FireStoreHandler {
                 }
                 var isFriend = false
                 friendArray.forEach {
-                    if (it.uid == targetUid){
+                    if (it.uid == targetUid) {
                         isFriend = true
                         return@forEach
                     }
@@ -1945,11 +1943,14 @@ class FireStoreHandler {
 
     }
 
-    fun createChatRoom(targetUid: String) {
+    fun createChatRoom(
+        targetUid: String,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<String>
+    ) {
         firestore.collection(CHAT_ROOM)
             .document("chat")
             .get()
-            .addOnCompleteListener { task->
+            .addOnCompleteListener { task ->
                 if (!task.isSuccessful && task.result == null) {
 
                     return@addOnCompleteListener
@@ -1959,7 +1960,7 @@ class FireStoreHandler {
                 if (snapshot == null || snapshot.data == null) {
 
                     MichaelLog.i("沒有聊天室 snapshot is null")
-                    createFirstChatRoom(targetUid)
+                    createFirstChatRoom(targetUid,onFireStoreCatchDataListener)
 
                     return@addOnCompleteListener
                 }
@@ -1973,31 +1974,34 @@ class FireStoreHandler {
                 if (friendArray.isNullOrEmpty()) {
 
                     MichaelLog.i("沒有聊天室 data is null")
-                    createFirstChatRoom(targetUid)
+                    createFirstChatRoom(targetUid, onFireStoreCatchDataListener)
                     return@addOnCompleteListener
                 }
 
                 var isFoundChatRoom = false
                 friendArray.forEach {
-                    if (it.chatId.contains(targetUid) && it.chatId.contains(AuthHandler.getCurrentUser()?.uid.toString())){
+                    if (it.chatId.contains(targetUid) && it.chatId.contains(AuthHandler.getCurrentUser()?.uid.toString())) {
                         isFoundChatRoom = true
                         return@forEach
                     }
                 }
-                if (isFoundChatRoom){
+                if (isFoundChatRoom) {
                     MichaelLog.i("已有聊天室不創建新的")
                     return@addOnCompleteListener
                 }
                 val data = ChatRoom()
                 data.chatId = "$targetUid&${AuthHandler.getCurrentUser()?.uid}"
                 friendArray.add(data)
+                onFireStoreCatchDataListener.onCatchDataSuccess(data.chatId)
                 createNewChatRoom(friendArray)
 
             }
     }
 
-    private fun createNewChatRoom(friendArray: java.util.ArrayList<ChatRoom>) {
-        val map = HashMap<String,String>()
+    private fun createNewChatRoom(
+        friendArray: java.util.ArrayList<ChatRoom>
+    ) {
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(friendArray)
         firestore.collection(CHAT_ROOM)
             .document("chat")
@@ -2005,17 +2009,21 @@ class FireStoreHandler {
         MichaelLog.i("建立聊天室成功")
     }
 
-    private fun createFirstChatRoom(targetUid: String) {
+    private fun createFirstChatRoom(
+        targetUid: String,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<String>
+    ) {
         val chatRoomArray = ArrayList<ChatRoom>()
         val data = ChatRoom()
         data.chatId = "$targetUid&${AuthHandler.getCurrentUser()?.uid}"
         chatRoomArray.add(data)
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(chatRoomArray)
         firestore.collection(CHAT_ROOM)
             .document("chat")
             .set(map, SetOptions.merge())
         MichaelLog.i("建立第一筆聊天室成功")
+        onFireStoreCatchDataListener.onCatchDataSuccess(data.chatId)
 
     }
 

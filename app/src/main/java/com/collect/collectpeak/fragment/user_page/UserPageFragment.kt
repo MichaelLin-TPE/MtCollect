@@ -80,7 +80,7 @@ class UserPageFragment : MtCollectorFragment() {
                 }
 
                 override fun onMessageClick() {
-                    viewModel.onMessageClickListener(targetUid)
+                    viewModel.onMessageClickListener()
                 }
 
             })
@@ -130,11 +130,11 @@ class UserPageFragment : MtCollectorFragment() {
                 showToast(content)
             }
 
-            override fun onGoToUserChatPage(targetUid: String) {
+            override fun onGoToUserChatPage(targetChatId: String) {
                 FragmentUtil.replace(
                     R.id.container,
                     fragmentActivity.supportFragmentManager,
-                    ChatFragment.newInstance(targetUid),
+                    ChatFragment.newInstance(targetChatId),
                     true,
                     ChatFragment.javaClass.simpleName,
                     1
