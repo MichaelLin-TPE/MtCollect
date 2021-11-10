@@ -86,6 +86,7 @@ class GoalFragment : MtCollectorFragment() {
     private fun goToGoalPage(data: SummitData) {
         val intent = Intent(fragmentActivity,GoalActivity::class.java)
         intent.putExtra("data",data)
+        intent.putExtra("uid",uid)
         fragmentActivity.startActivity(intent)
         Tool.startActivityInAnim(fragmentActivity,2)
     }

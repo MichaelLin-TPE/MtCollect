@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
+        <variable
+            name="vm"
+            type="com.collect.collectpeak.fragment.chat.ChatViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:background="@color/page_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragment.equipment.chat.ChatFragment">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mt_action_bar"
+            android:background="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize">
+
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:src="@drawable/back"
+                android:onClick="@{(v)->clickListener.onBackButtonClickListener(v)}"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginStart="16dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+
+
+            <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                android:id="@+id/mt_action_bar_title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:textSize="25sp"
+                android:text="@{vm.actionBarTitleLiveData}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat_recycler_view"
+            app:layout_constraintTop_toBottomOf="@id/mt_action_bar"
+            app:layout_constraintBottom_toTopOf="@id/chat_edit_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"/>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:id="@+id/chat_edit_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/white"
+            android:layout_height="wrap_content">
+
+            <com.collect.collectpeak.custom_widget.CollectPeakEditTextView
+                android:id="@+id/chat_edit_message"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/chat_send_button"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/chat_edit_message_shape"
+                android:padding="8dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+            <com.collect.collectpeak.custom_widget.CollectPeakButton
+                android:id="@+id/chat_send_button"
+                android:text="@string/title_send"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:background="@drawable/custom_follow_button_shape"
+                app:layout_constraintTop_toTopOf="@id/chat_edit_message"
+                app:layout_constraintBottom_toBottomOf="@id/chat_edit_message"
+                app:layout_constraintLeft_toRightOf="@id/chat_edit_message"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginEnd="16dp"
+                android:layout_width="80dp"
+                android:layout_height="0dp"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

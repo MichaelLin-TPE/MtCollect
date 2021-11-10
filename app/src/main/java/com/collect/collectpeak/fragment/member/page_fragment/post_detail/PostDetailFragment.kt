@@ -14,6 +14,7 @@ import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentPostDetailBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.GoalSettingDialog
+import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditFragment
 import com.collect.collectpeak.fragment.share.ShareData
 import com.collect.collectpeak.log.MichaelLog
@@ -30,6 +31,8 @@ class PostDetailFragment : MtCollectorFragment() {
 
     private val adapter = PostListAdapter()
 
+    private var targetUid = ""
+
     private val viewModel: PostDetailViewModel by activityViewModels {
         PostDetailViewModel.PostDetailFactory()
     }
@@ -44,10 +47,11 @@ class PostDetailFragment : MtCollectorFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(data: ShareData) =
+        fun newInstance(data: ShareData, uid: String) =
             PostDetailFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable("data", data)
+                    putString("uid",uid)
                 }
             }
     }
@@ -56,6 +60,7 @@ class PostDetailFragment : MtCollectorFragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             targetShareData = it.getParcelable<ShareData>("data") as ShareData
+            targetUid = it.getString("uid","")
         }
     }
 
@@ -87,6 +92,9 @@ class PostDetailFragment : MtCollectorFragment() {
         //處理點擊事件的 interface
         viewModel.setOnPostDetailClickEventListener(object : OnPostDetailClickEventListener {
             override fun onClickSetting(shareData: ShareData) {
+                if (targetUid != AuthHandler.getCurrentUser()?.uid){
+                    return
+                }
                 showSettingDialog(shareData)
             }
 
@@ -147,7 +155,7 @@ class PostDetailFragment : MtCollectorFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.onFragmentResume(targetShareData)
+        viewModel.onFragmentResume(targetShareData,targetUid)
         observerHandle()
     }
 

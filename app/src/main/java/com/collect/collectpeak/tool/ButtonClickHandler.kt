@@ -1,6 +1,7 @@
 package com.collect.collectpeak.tool
 
 import android.view.View
+import com.collect.collectpeak.fragment.chat.ChatViewModel
 import com.collect.collectpeak.fragment.equipment.EquipmentListViewModel
 import com.collect.collectpeak.fragment.member.MemberViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDetailViewModel
@@ -117,6 +118,9 @@ class ButtonClickHandler<T>(private val viewModel:T) {
             viewModel.onBackButtonClickListener()
         }
         if(viewModel is UserPageViewModel){
+            viewModel.onBackPressClickListener()
+        }
+        if(viewModel is ChatViewModel){
             viewModel.onBackPressClickListener()
         }
 

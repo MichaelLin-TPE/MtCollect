@@ -11,11 +11,19 @@ class PostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
 
-        val data = intent.extras?.getParcelable<ShareData>("data") as ShareData
+        var data = ShareData()
+
+        var uid = ""
+
+        intent.extras?.let {
+            data = it.getParcelable<ShareData>("data") as ShareData
+            uid = it.getString("uid","")
+        }
+
 
         val transaction = supportFragmentManager.beginTransaction()
 
-        transaction.replace(R.id.container,PostDetailFragment.newInstance(data)).commit()
+        transaction.replace(R.id.container,PostDetailFragment.newInstance(data,uid)).commit()
 
     }
 }

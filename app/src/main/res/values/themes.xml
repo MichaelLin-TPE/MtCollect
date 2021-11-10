@@ -2,6 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.CollectPeak" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
+        <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">#B3B1AEAE</item>

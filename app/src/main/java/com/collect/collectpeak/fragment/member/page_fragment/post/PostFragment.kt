@@ -95,6 +95,7 @@ class PostFragment : Fragment() {
     private fun intentToPostEditPage(shareData: ShareData) {
         val intent = Intent(fragmentActivity,PostActivity::class.java)
         intent.putExtra("data",shareData)
+        intent.putExtra("uid",targetUid)
         fragmentActivity.startActivity(intent)
         Tool.startActivityInAnim(fragmentActivity,2)
     }

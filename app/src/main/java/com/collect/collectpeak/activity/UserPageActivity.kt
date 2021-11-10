@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.collect.collectpeak.R
 import com.collect.collectpeak.fragment.user_page.UserPageFragment
+import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.StatusBarTool
 
 class UserPageActivity : AppCompatActivity() {

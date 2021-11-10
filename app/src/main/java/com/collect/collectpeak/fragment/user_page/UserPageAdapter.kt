@@ -3,9 +3,11 @@ package com.collect.collectpeak.fragment.user_page
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -28,32 +30,39 @@ class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val MEMBER_TYPE_PAGE = 1
     }
 
-    private lateinit var onMemberInfoClickListener: OnMemberInfoClickListener
+    private lateinit var onUserInfoClickListener: OnUserInfoClickListener
 
     private lateinit var fragmentManager: FragmentManager
 
     private var uid = ""
+
+    private var followButtonText = ""
+
+    private var isFollowButtonEnable = false
 
     fun setUid(uid :String){
         this.uid = uid
     }
 
 
-    fun setOnMemberInfoClickListener(onMemberInfoClickListener: OnMemberInfoClickListener) {
-        this.onMemberInfoClickListener = onMemberInfoClickListener
+    fun setOnMemberInfoClickListener(onUserInfoClickListener: OnUserInfoClickListener) {
+        this.onUserInfoClickListener = onUserInfoClickListener
     }
 
     fun setFragmentManager(fragmentManager: FragmentManager) {
         this.fragmentManager = fragmentManager
     }
-
+    fun setFollowButtonData(buttonText: String, isEnable: Boolean) {
+        this.followButtonText = buttonText
+        this.isFollowButtonEnable = isEnable
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
         if (viewType == MEMBER_INFO) {
 
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.member_info_layout, parent, false)
+                .inflate(R.layout.user_info_layout, parent, false)
             return MemberInfoViewHolder(view)
 
         }
@@ -70,8 +79,8 @@ class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         if (holder is MemberInfoViewHolder) {
 
-            holder.showView(uid)
-            holder.setOnMemberInfoClickListener(onMemberInfoClickListener)
+            holder.showView(uid,followButtonText,isFollowButtonEnable)
+            holder.setOnUserInfoClickListener(onUserInfoClickListener)
             return
         }
         if (holder is MemberPageViewHolder){
@@ -100,9 +109,11 @@ class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return MEMBER_TYPE_PAGE
     }
 
+
+
     class MemberInfoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private lateinit var onMemberInfoClickListener: OnMemberInfoClickListener
+        private lateinit var onUserInfoClickListener: OnUserInfoClickListener
 
         private val ivPhoto = itemView.findViewById<ImageView>(R.id.member_photo)
 
@@ -112,19 +123,29 @@ class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val tvFriendCount = itemView.findViewById<TextView>(R.id.member_friend_count)
 
-        private val editView = itemView.findViewById<ConstraintLayout>(R.id.member_edit_profile)
+        private val btnFollow = itemView.findViewById<Button>(R.id.member_follow_button)
+
+        private val btnMessage = itemView.findViewById<Button>(R.id.member_message_button)
 
         private val tvName = itemView.findViewById<TextView>(R.id.member_post_name)
 
         private val tvDescription = itemView.findViewById<TextView>(R.id.member_post_description)
 
-        fun showView(uid : String) {
-            ivPhoto.setOnClickListener {
-                onMemberInfoClickListener.onPhotoSelectListener()
+        fun showView(uid: String, followButtonText: String, isFollowButtonEnable: Boolean) {
+
+            btnFollow.setOnClickListener {
+                onUserInfoClickListener.onFollowClick()
             }
 
-            editView.setOnClickListener {
-                onMemberInfoClickListener.onEditUserProfileClickListener()
+            btnFollow.text = followButtonText
+            btnFollow.isEnabled = isFollowButtonEnable
+
+            if (!isFollowButtonEnable){
+                btnFollow.setTextColor(ContextCompat.getColor(MtCollectorApplication.getInstance().getContext(),R.color.grey))
+            }
+
+            btnMessage.setOnClickListener {
+                onUserInfoClickListener.onMessageClick()
             }
 
             FireStoreHandler.getInstance().getUserProfileByUid(uid,object : FireStoreHandler.OnFireStoreCatchDataListener<MemberData>{
@@ -178,8 +199,8 @@ class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         }
 
-        fun setOnMemberInfoClickListener(onMemberInfoClickListener: UserPageAdapter.OnMemberInfoClickListener) {
-            this.onMemberInfoClickListener = onMemberInfoClickListener
+        fun setOnUserInfoClickListener(onUserInfoClickListener: OnUserInfoClickListener) {
+            this.onUserInfoClickListener = onUserInfoClickListener
         }
 
     }
@@ -330,10 +351,12 @@ class UserPageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     }
 
-    interface OnMemberInfoClickListener {
-        fun onPhotoSelectListener()
+    interface OnUserInfoClickListener {
 
-        fun onEditUserProfileClickListener()
+        fun onFollowClick()
+
+        fun onMessageClick()
+
     }
 
 }

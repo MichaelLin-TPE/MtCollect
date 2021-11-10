@@ -33,8 +33,9 @@ class GoalDetailViewModel : ViewModel() {
 
     private lateinit var allSummitList : ArrayList<SummitData>
 
-    fun onFragmentStart(targetSummitData: SummitData) {
-        FireStoreHandler.getInstance().getUserSummitData(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<SummitData>>{
+    fun onFragmentStart(targetSummitData: SummitData, targetUid: String) {
+
+        FireStoreHandler.getInstance().getUserSummitDataByUid(targetUid,object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<SummitData>>{
             override fun onCatchDataSuccess(data: ArrayList<SummitData>) {
 
                 allSummitList = data

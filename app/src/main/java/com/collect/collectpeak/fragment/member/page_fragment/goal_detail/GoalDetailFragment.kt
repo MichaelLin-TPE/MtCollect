@@ -17,9 +17,9 @@ import com.collect.collectpeak.activity.GoalEditActivity
 import com.collect.collectpeak.databinding.FragmentGoalDetailBinding
 import com.collect.collectpeak.dialog.ConfirmDialog
 import com.collect.collectpeak.dialog.GoalSettingDialog
+import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.log.MichaelLog
-import com.collect.collectpeak.main_frame.OnBackButtonClickEventCallBackListener
 import com.collect.collectpeak.tool.ButtonClickHandler
 import com.collect.collectpeak.tool.Tool
 
@@ -32,6 +32,8 @@ class GoalDetailFragment : MtCollectorFragment() {
 
     private lateinit var dataBinding: FragmentGoalDetailBinding
 
+    private var targetUid = ""
+
     private val goalSettingDialog = GoalSettingDialog.instance
 
     private val adapter = GoalDetailAdapter()
@@ -42,10 +44,11 @@ class GoalDetailFragment : MtCollectorFragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(data: SummitData) =
+        fun newInstance(data: SummitData, uid: String) =
             GoalDetailFragment().apply {
                 arguments = Bundle().apply {
                     this.putParcelable("data", data)
+                    this.putString("uid",uid)
                 }
             }
     }
@@ -59,12 +62,13 @@ class GoalDetailFragment : MtCollectorFragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             targetSummitData = it.getParcelable<SummitData>("data") as SummitData
+            targetUid = it.getString("uid","")
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.onFragmentStart(targetSummitData)
+        viewModel.onFragmentStart(targetSummitData,targetUid)
 
         observerHandle()
     }
@@ -86,9 +90,12 @@ class GoalDetailFragment : MtCollectorFragment() {
             adapter.setOnGoalSettingClickListener(object :
                 GoalDetailAdapter.OnGoalSettingClickListener {
                 override fun onSettingClick(data: SummitData) {
+
+                    if (targetUid != AuthHandler.getCurrentUser()?.uid){
+                        return
+                    }
                     showGoalSettingDialog(data)
                 }
-
             })
 
         })

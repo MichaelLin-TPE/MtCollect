@@ -37,7 +37,7 @@ class PostDetailViewModel : ViewModel() {
         onBackButtonClickEventCallBackListener.onBackClick()
     }
 
-    fun onFragmentResume(targetShareData: ShareData) {
+    fun onFragmentResume(targetShareData: ShareData, targetUid: String) {
 
         FireStoreHandler.getInstance().getUserPostData(object :
             FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<ShareData>> {
@@ -47,7 +47,7 @@ class PostDetailViewModel : ViewModel() {
                 val iterator = data.iterator()
                 while (iterator.hasNext()) {
                     val shareData = iterator.next()
-                    if (shareData.uid != AuthHandler.getCurrentUser()?.uid) {
+                    if (shareData.uid != targetUid) {
                         iterator.remove()
                     }
                 }
