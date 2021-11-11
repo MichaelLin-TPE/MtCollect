@@ -126,5 +126,14 @@ class ButtonClickHandler<T>(private val viewModel:T) {
 
     }
 
+    /**
+     * 發送聊天紀錄點擊事件
+     */
+    fun onSendMessageClickListener(view: View){
+        if(viewModel is ChatViewModel){
+            viewModel.onSendMessageClickListener()
+        }
+    }
+
 
 }

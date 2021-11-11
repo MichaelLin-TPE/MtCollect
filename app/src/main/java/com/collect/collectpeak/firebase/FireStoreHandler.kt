@@ -2,6 +2,7 @@ package com.collect.collectpeak.firebase
 
 import android.graphics.Bitmap
 import com.collect.collectpeak.fragment.chat.ChatRoom
+import com.collect.collectpeak.fragment.chat.MessageData
 import com.collect.collectpeak.fragment.equipment.equipment_select.*
 import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
@@ -61,6 +62,7 @@ class FireStoreHandler {
         const val NO_FRIEND = "no_friend"
         const val IS_FRIEND = "is_friend"
         const val CHAT_ROOM = "chat_room"
+        const val CHAT_DATA = "chat_data"
         fun getInstance(): FireStoreHandler {
             return instance
         }
@@ -1979,18 +1981,21 @@ class FireStoreHandler {
                 }
 
                 var isFoundChatRoom = false
+                var chatId = ""
                 friendArray.forEach {
                     if (it.chatId.contains(targetUid) && it.chatId.contains(AuthHandler.getCurrentUser()?.uid.toString())) {
                         isFoundChatRoom = true
+                        chatId = it.chatId
                         return@forEach
                     }
                 }
                 if (isFoundChatRoom) {
                     MichaelLog.i("已有聊天室不創建新的")
+                    onFireStoreCatchDataListener.onCatchDataSuccess(chatId)
                     return@addOnCompleteListener
                 }
                 val data = ChatRoom()
-                data.chatId = "$targetUid&${AuthHandler.getCurrentUser()?.uid}"
+                data.chatId = "$targetUid${AuthHandler.getCurrentUser()?.uid}"
                 friendArray.add(data)
                 onFireStoreCatchDataListener.onCatchDataSuccess(data.chatId)
                 createNewChatRoom(friendArray)
@@ -2015,7 +2020,7 @@ class FireStoreHandler {
     ) {
         val chatRoomArray = ArrayList<ChatRoom>()
         val data = ChatRoom()
-        data.chatId = "$targetUid&${AuthHandler.getCurrentUser()?.uid}"
+        data.chatId = "$targetUid${AuthHandler.getCurrentUser()?.uid}"
         chatRoomArray.add(data)
         val map = HashMap<String, String>()
         map["json"] = Gson().toJson(chatRoomArray)
@@ -2025,6 +2030,54 @@ class FireStoreHandler {
         MichaelLog.i("建立第一筆聊天室成功")
         onFireStoreCatchDataListener.onCatchDataSuccess(data.chatId)
 
+    }
+
+    private var allMessageArray = ArrayList<MessageData>()
+
+    fun getChatRecord(
+        targetChatId: String,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<MessageData>>
+    ) {
+
+        val documentReference = firestore.collection(CHAT_DATA).document(targetChatId)
+
+        documentReference.addSnapshotListener { value, error ->
+
+            if (error != null) {
+
+                onFireStoreCatchDataListener.onCatchDataFail()
+                MichaelLog.i("錯誤 無法取的使用者資料")
+                return@addSnapshotListener
+            }
+
+            if (value != null && value.exists()) {
+
+                val json = value.get("json") as String
+
+                allMessageArray = Gson().fromJson<ArrayList<MessageData>>(
+                    json,
+                    object : TypeToken<ArrayList<MessageData>>() {}.type
+                )
+
+                if (allMessageArray.isNullOrEmpty()) {
+                    MichaelLog.i("無聊天資料")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addSnapshotListener
+                }
+
+                onFireStoreCatchDataListener.onCatchDataSuccess(allMessageArray)
+            }else{
+                MichaelLog.i("無聊天資料")
+            }
+        }
+
+    }
+
+    fun setMessageData(data: MessageData, targetChatId: String) {
+        allMessageArray.add(data)
+        val map = HashMap<String,String>()
+        map["json"] = Gson().toJson(allMessageArray)
+        firestore.collection(CHAT_DATA).document(targetChatId).set(map, SetOptions.merge())
     }
 
 

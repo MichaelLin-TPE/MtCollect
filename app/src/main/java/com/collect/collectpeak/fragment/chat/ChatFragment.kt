@@ -2,15 +2,19 @@ package com.collect.collectpeak.fragment.chat
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentChatBinding
+import com.collect.collectpeak.log.MichaelLog
 import com.collect.collectpeak.tool.ButtonClickHandler
 
 
@@ -18,6 +22,12 @@ class ChatFragment : MtCollectorFragment() {
 
     private lateinit var dataBinding: FragmentChatBinding
     private var targetChatId = ""
+
+    private val adapter = ChatAdapter()
+
+    private var isUpdated = false
+
+    private var lastMessagePosition = 0
 
     private val viewModel: ChatViewModel by activityViewModels {
         ChatViewModel.ChatFactory()
@@ -51,6 +61,30 @@ class ChatFragment : MtCollectorFragment() {
     override fun onStart() {
         super.onStart()
         viewModel.onFragmentStart(targetChatId)
+        observerHandle()
+    }
+
+    private fun observerHandle() {
+        viewModel.messageListLiveData.observe(this,{
+
+            lastMessagePosition = it.size - 1
+
+            if (isUpdated){
+                adapter.setData(it)
+                adapter.notifyItemChanged(lastMessagePosition)
+                dataBinding.chatRecyclerView.scrollToPosition(lastMessagePosition)
+                return@observe
+            }
+
+            adapter.setData(it)
+
+            dataBinding.chatRecyclerView.adapter = adapter
+
+            isUpdated = true
+
+            dataBinding.chatRecyclerView.scrollToPosition(lastMessagePosition)
+
+        })
     }
 
     override fun onCreateView(
@@ -67,6 +101,10 @@ class ChatFragment : MtCollectorFragment() {
     }
 
     private fun initView(root: View) {
+
+        dataBinding.chatRecyclerView.layoutManager = LinearLayoutManager(fragmentActivity)
+
+
         viewModel.setOnChatClickEventListener(object : OnChatClickEventListener {
             override fun onBackPress() {
                 fragmentActivity.supportFragmentManager.popBackStack()
@@ -77,6 +115,23 @@ class ChatFragment : MtCollectorFragment() {
             }
 
         })
+
+
+        dataBinding.chatEditMessage.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(message: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.onMessageTextChangeListener(message.toString())
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+
+        })
+
     }
 
 

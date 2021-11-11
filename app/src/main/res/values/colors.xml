@@ -26,4 +26,6 @@
     <color name="click_pressed">#A0A0A0</color>
     <color name="grey_light">#ECECEC</color>
     <color name="orange">#EF592A</color>
+    <color name="news_blue_pressed">#A6CEEE</color>
+    <color name="speech_bubble_user">#F8EFB4</color>
 </resources>

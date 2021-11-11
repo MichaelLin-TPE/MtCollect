@@ -46,7 +46,7 @@ class PostListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        MichaelLog.i("getItemViewType $position")
+
         return POST_LIST
     }
 
