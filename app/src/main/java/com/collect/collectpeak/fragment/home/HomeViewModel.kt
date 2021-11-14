@@ -4,8 +4,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.collect.collectpeak.api.json_object.WeatherObject
+import com.collect.collectpeak.firebase.AuthHandler
+import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.fragment.home.news.NewsData
 import com.collect.collectpeak.fragment.home.weather.LocationData
+import com.collect.collectpeak.fragment.notice.NoticeData
 import com.collect.collectpeak.log.MichaelLog
 
 class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
@@ -15,6 +18,14 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
     val locationListLiveData = MutableLiveData<ArrayList<LocationData>>()
 
     val newsListLiveData = MutableLiveData<ArrayList<NewsData>>()
+
+    val showRedPointLiveData = MutableLiveData(false)
+
+    private lateinit var onHomeClickEventListener: OnHomeClickEventListener
+
+    fun setOnHomeClickEventListener(onHomeClickEventListener: OnHomeClickEventListener){
+        this.onHomeClickEventListener = onHomeClickEventListener
+    }
 
     private lateinit var weatherData : WeatherObject
 
@@ -37,6 +48,36 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
             }
 
             override fun onCatchNewsFail() {
+
+            }
+
+        })
+
+        val uid = AuthHandler.getCurrentUser()?.uid ?: return
+
+        FireStoreHandler.getInstance().getUserNotificationByUid(uid,object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<NoticeData>>{
+            override fun onCatchDataSuccess(data: ArrayList<NoticeData>) {
+
+                var isFoundUnCheck = false
+
+                data.forEach {
+                    if (!it.isCheck){
+                        isFoundUnCheck = true
+                        return@forEach
+                    }
+                }
+
+                if (!isFoundUnCheck){
+                    showRedPointLiveData.value = false
+                    onHomeClickEventListener.onStopNoticeAnimation()
+                    return
+                }
+                showRedPointLiveData.value = true
+                onHomeClickEventListener.onStartNoticeAnimation()
+
+            }
+
+            override fun onCatchDataFail() {
 
             }
 
@@ -72,6 +113,10 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
 
 
 
+    }
+
+    fun onNoticeClickListener() {
+        onHomeClickEventListener.onGotoNotificationPage()
     }
 
 

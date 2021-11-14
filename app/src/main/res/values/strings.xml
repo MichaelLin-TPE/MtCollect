@@ -110,4 +110,6 @@
     <string name="title_follow">追蹤</string>
     <string name="title_message">訊息</string>
     <string name="title_send">傳送</string>
+    <string name="title_notice">通知</string>
+    <string name="title_no_notification">目前無任何通知</string>
 </resources>

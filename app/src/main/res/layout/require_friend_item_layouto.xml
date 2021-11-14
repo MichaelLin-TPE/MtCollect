@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/notice_photo"
+        app:riv_oval="true"
+        android:src="@drawable/hiking_logo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:scaleType="centerCrop"
+        android:layout_width="40dp"
+        android:visibility="visible"
+        android:layout_height="40dp"/>
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        android:id="@+id/notice_content"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="@id/notice_photo"
+        app:layout_constraintBottom_toBottomOf="@id/notice_photo"
+        app:layout_constraintLeft_toRightOf="@id/notice_photo"
+        android:layout_marginStart="16dp"
+        app:layout_constraintRight_toLeftOf="@id/notice_reject"
+        android:layout_marginEnd="16dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="Michael 發送朋友邀請給你"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/notice_reject"
+        android:src="@drawable/reject"
+        app:layout_constraintTop_toTopOf="@id/notice_content"
+        app:layout_constraintBottom_toBottomOf="@id/notice_content"
+        app:layout_constraintLeft_toRightOf="@id/notice_content"
+        app:layout_constraintRight_toLeftOf="@id/notice_confirm"
+        android:layout_marginEnd="20dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"/>
+
+    <ImageView
+        android:id="@+id/notice_confirm"
+        android:src="@drawable/check"
+        app:layout_constraintTop_toTopOf="@id/notice_reject"
+        app:layout_constraintBottom_toBottomOf="@id/notice_reject"
+        app:layout_constraintLeft_toRightOf="@id/notice_reject"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

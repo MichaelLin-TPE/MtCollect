@@ -1,22 +1,30 @@
 package com.collect.collectpeak.fragment.home
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.NoticeActivity
 import com.collect.collectpeak.databinding.FragmentHomeBinding
 import com.collect.collectpeak.dialog.LocationListDialog
 import com.collect.collectpeak.fragment.home.news.NewsAdapter
 import com.collect.collectpeak.fragment.home.weather.LocationData
 import com.collect.collectpeak.log.MichaelLog
+import com.collect.collectpeak.tool.ButtonClickHandler
+import com.collect.collectpeak.tool.Tool
 import java.util.ArrayList
 
 class HomeFragment : MtCollectorFragment() {
@@ -26,6 +34,10 @@ class HomeFragment : MtCollectorFragment() {
     private lateinit var dataBinding: FragmentHomeBinding
 
     private lateinit var adapter: HomeAdapter
+
+    private var degree = 25f
+
+    private val handler = Handler(Looper.myLooper()!!)
 
     private val viewModel: HomeViewModel by activityViewModels {
         val repository = HomeRepositoryImpl()
@@ -54,6 +66,7 @@ class HomeFragment : MtCollectorFragment() {
 
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         dataBinding.vm = viewModel
+        dataBinding.clickListener = ButtonClickHandler(viewModel)
         val view = dataBinding.root
         dataBinding.lifecycleOwner = this
         initView()
@@ -62,7 +75,9 @@ class HomeFragment : MtCollectorFragment() {
     }
 
     private fun initView() {
+
         MichaelLog.i("initHomeAdapter")
+
         adapter = HomeAdapter()
 
         adapter.setOnHomeListItemClickListener(object : HomeAdapter.OnHomeListItemClickListener {
@@ -82,7 +97,62 @@ class HomeFragment : MtCollectorFragment() {
 
         })
 
+        viewModel.setOnHomeClickEventListener(object : OnHomeClickEventListener{
+            override fun onStartNoticeAnimation() {
+                doNoticeAnimation()
+            }
 
+            override fun onStopNoticeAnimation() {
+                stopNoticeAnimation()
+            }
+
+            override fun onGotoNotificationPage() {
+               val intent = Intent(fragmentActivity,NoticeActivity::class.java)
+                fragmentActivity.startActivity(intent)
+                Tool.startActivityInAnim(fragmentActivity,1)
+            }
+
+        })
+    }
+
+    private fun stopNoticeAnimation() {
+        handler.removeCallbacks(rotate45)
+        handler.removeCallbacks(rotate45Again)
+        dataBinding.homeActionBarNotice.clearAnimation()
+        dataBinding.homeActionBarNotice.setImageResource(R.drawable.notice)
+        dataBinding.homeActionBarNotice.rotation = 0f
+    }
+
+    private fun doNoticeAnimation() {
+        handler.removeCallbacks(rotate45)
+        handler.removeCallbacks(rotate45Again)
+        dataBinding.homeActionBarNotice.clearAnimation()
+        dataBinding.homeActionBarNotice.setImageResource(R.drawable.notice)
+        dataBinding.homeActionBarNotice.rotation = 0f
+        handler.post(rotate45)
+
+    }
+
+    private val rotate45 = Runnable {
+        dataBinding.homeActionBarNotice.animate().rotationBy(degree).setDuration(200).start()
+        degree = -60f
+        doRotate45()
+
+    }
+
+    private fun doRotate45() {
+        handler.postDelayed(rotate45Again,200)
+    }
+
+    private val rotate45Again = Runnable {
+        dataBinding.homeActionBarNotice.animate().rotationBy(degree).setDuration(200).start()
+        degree = 60f
+        doRotate45Again()
+
+    }
+
+    private fun doRotate45Again() {
+        handler.postDelayed(rotate45,200)
     }
 
     override fun onResume() {

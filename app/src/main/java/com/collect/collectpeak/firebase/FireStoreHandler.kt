@@ -8,6 +8,8 @@ import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
 import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
+import com.collect.collectpeak.fragment.notice.NoticeData
+import com.collect.collectpeak.fragment.notice.NoticeType.Companion.REQUEST_FRIEND
 import com.collect.collectpeak.fragment.share.ShareData
 import com.collect.collectpeak.fragment.user_page.FriendApplyData
 import com.collect.collectpeak.fragment.user_page.FriendData
@@ -63,6 +65,7 @@ class FireStoreHandler {
         const val IS_FRIEND = "is_friend"
         const val CHAT_ROOM = "chat_room"
         const val CHAT_DATA = "chat_data"
+        const val NOTIFICATION = "notification"
         fun getInstance(): FireStoreHandler {
             return instance
         }
@@ -1380,7 +1383,8 @@ class FireStoreHandler {
 
                 userList.forEach {
                     if (it.userId == uid) {
-                        onFireStoreCatchDataListener.onCatchDataSuccess(it.name)
+
+                        onFireStoreCatchDataListener.onCatchDataSuccess(if (it.name.isEmpty()) it.email else it.name)
                         return@forEach
                     }
                 }
@@ -1798,6 +1802,16 @@ class FireStoreHandler {
 
     }
 
+    private fun saveFriendApplyData(applyArray: java.util.ArrayList<FriendApplyData>) {
+        val map = HashMap<String, String>()
+        map["json"] = Gson().toJson(applyArray)
+
+        firestore.collection(FRIEND_APPLY)
+            .document("friend")
+            .set(map, SetOptions.merge())
+        MichaelLog.i("已清除申請朋友資料")
+    }
+
     private fun saveFriendApplyData(
         applyArray: java.util.ArrayList<FriendApplyData>,
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<Unit>
@@ -1962,7 +1976,7 @@ class FireStoreHandler {
                 if (snapshot == null || snapshot.data == null) {
 
                     MichaelLog.i("沒有聊天室 snapshot is null")
-                    createFirstChatRoom(targetUid,onFireStoreCatchDataListener)
+                    createFirstChatRoom(targetUid, onFireStoreCatchDataListener)
 
                     return@addOnCompleteListener
                 }
@@ -2066,7 +2080,7 @@ class FireStoreHandler {
                 }
 
                 onFireStoreCatchDataListener.onCatchDataSuccess(allMessageArray)
-            }else{
+            } else {
                 MichaelLog.i("無聊天資料")
             }
         }
@@ -2075,11 +2089,165 @@ class FireStoreHandler {
 
     fun setMessageData(data: MessageData, targetChatId: String) {
         allMessageArray.add(data)
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(allMessageArray)
         firestore.collection(CHAT_DATA).document(targetChatId).set(map, SetOptions.merge())
     }
 
+    fun sendNotification(targetUid: String , data : NoticeData) {
+
+        firestore.collection(NOTIFICATION)
+            .document(targetUid)
+            .get()
+            .addOnCompleteListener { task ->
+
+                if (!task.isSuccessful && task.result == null) {
+
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+
+                    MichaelLog.i("沒有通知 snapshot is null")
+                    val array = ArrayList<NoticeData>()
+                    array.add(data)
+                    saveNoticeData(targetUid,array)
+
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val noticeArray = Gson().fromJson<ArrayList<NoticeData>>(
+                    json,
+                    object : TypeToken<ArrayList<NoticeData>>() {}.type
+                )
+                if (noticeArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有通知 data is null")
+                    val array = ArrayList<NoticeData>()
+                    array.add(data)
+                    saveNoticeData(targetUid,array)
+
+                    return@addOnCompleteListener
+                }
+
+                noticeArray.add(data)
+                saveNoticeData(targetUid,noticeArray)
+
+
+            }
+
+    }
+
+    private fun saveNoticeData(targetUid: String,noticeArray : ArrayList<NoticeData>){
+
+        val map = HashMap<String,String>()
+        map["json"] = Gson().toJson(noticeArray)
+        firestore.collection(NOTIFICATION)
+            .document(targetUid)
+            .set(map, SetOptions.merge())
+
+
+    }
+
+    fun getUserNotificationByUid(
+        uid: String?,
+        onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<NoticeData>>
+    ) {
+        if (uid == null){
+            return
+        }
+        val documentReference = firestore.collection(NOTIFICATION).document(uid)
+
+        documentReference.addSnapshotListener { value, error ->
+
+            if (error != null) {
+
+                onFireStoreCatchDataListener.onCatchDataFail()
+                MichaelLog.i("錯誤 無法取得通知資料")
+                return@addSnapshotListener
+            }
+
+            if (value != null && value.exists()) {
+
+                val json = value.get("json") as String
+
+                val noticeArray = Gson().fromJson<ArrayList<NoticeData>>(
+                    json,
+                    object : TypeToken<ArrayList<NoticeData>>() {}.type
+                )
+
+                if (noticeArray.isNullOrEmpty()) {
+                    MichaelLog.i("無通知資料")
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addSnapshotListener
+                }
+
+                onFireStoreCatchDataListener.onCatchDataSuccess(noticeArray)
+            } else {
+                onFireStoreCatchDataListener.onCatchDataFail()
+                MichaelLog.i("無通知資料")
+            }
+        }
+    }
+
+    fun saveUserNotificationByUid(uid: String, data: java.util.ArrayList<NoticeData>) {
+        val map = HashMap<String,String>()
+        map["json"] = Gson().toJson(data)
+        firestore.collection(NOTIFICATION)
+            .document(uid)
+            .set(map, SetOptions.merge())
+    }
+
+    fun clearApplyData(data: NoticeData) {
+        firestore.collection(FRIEND_APPLY)
+            .document("friend")
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful && task.result == null) {
+
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+                    MichaelLog.i("沒有申請朋友資料 snapshot is null")
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val applyArray = Gson().fromJson<ArrayList<FriendApplyData>>(
+                    json,
+                    object : TypeToken<ArrayList<FriendApplyData>>() {}.type
+                )
+                if (applyArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有申請朋友資料 data is null")
+                    return@addOnCompleteListener
+                }
+
+                for (apply in applyArray){
+                    if (apply.fromWho == data.fromWho && apply.toWho == AuthHandler.getCurrentUser()?.uid){
+                        applyArray.remove(apply)
+                        break
+                    }
+                }
+                saveFriendApplyData(applyArray)
+            }
+    }
+
+    fun updateNoticeDataByUid(uid: String, noticeArray: java.util.ArrayList<NoticeData>) {
+
+        val map = HashMap<String,String>()
+        map["json"] = Gson().toJson(noticeArray)
+
+        firestore.collection(NOTIFICATION)
+            .document(uid)
+            .set(map, SetOptions.merge())
+    }
 
     interface OnCheckUserExistResultListener {
         fun onUserExist()
@@ -2093,3 +2261,6 @@ class FireStoreHandler {
     }
 
 }
+
+
+

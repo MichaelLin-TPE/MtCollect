@@ -7,6 +7,8 @@ import com.collect.collectpeak.firebase.AuthHandler
 import com.collect.collectpeak.firebase.FireStoreHandler
 import com.collect.collectpeak.firebase.FireStoreHandler.Companion.INVITING
 import com.collect.collectpeak.firebase.FireStoreHandler.Companion.NO_FRIEND
+import com.collect.collectpeak.fragment.notice.NoticeData
+import com.collect.collectpeak.fragment.notice.NoticeType
 import com.collect.collectpeak.log.MichaelLog
 import org.json.JSONObject
 import java.lang.Exception
@@ -85,6 +87,15 @@ class UserPageViewModel : ViewModel() {
             }
 
         })
+
+        MichaelLog.i("發送通知")
+        val data = NoticeData()
+        data.type = NoticeType.REQUEST_FRIEND
+        data.fromWho = AuthHandler.getCurrentUser()?.uid.toString()
+        data.isCheck = false
+        data.timeStamp = System.currentTimeMillis()
+        FireStoreHandler.getInstance().sendNotification(targetUid,data)
+
     }
 
     private fun getFollowButtonJSONObject(buttonText: String, isEnable: Boolean): JSONObject {

@@ -3,12 +3,14 @@ package com.collect.collectpeak.tool
 import android.view.View
 import com.collect.collectpeak.fragment.chat.ChatViewModel
 import com.collect.collectpeak.fragment.equipment.EquipmentListViewModel
+import com.collect.collectpeak.fragment.home.HomeViewModel
 import com.collect.collectpeak.fragment.member.MemberViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDetailViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.post_detail.PostDetailViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditViewModel
 import com.collect.collectpeak.fragment.mountain.mt_list.MtViewModel
+import com.collect.collectpeak.fragment.notice.NoticeViewModel
 import com.collect.collectpeak.fragment.user_page.UserPageViewModel
 
 /**
@@ -17,6 +19,14 @@ import com.collect.collectpeak.fragment.user_page.UserPageViewModel
 
 class ButtonClickHandler<T>(private val viewModel:T) {
 
+    /**
+     * 點擊HOME通知
+     */
+    fun onNoticeClickListener(view: View){
+        if (viewModel is HomeViewModel){
+            viewModel.onNoticeClickListener()
+        }
+    }
 
     /**
      * 編輯登頂資料 重新選擇山頭的登頂日期點擊事件
@@ -102,6 +112,12 @@ class ButtonClickHandler<T>(private val viewModel:T) {
      * 所有的 BackButtonClickListener 都會使用這個方法
      */
     fun onBackButtonClickListener(view: View){
+
+        if (viewModel is NoticeViewModel){
+            viewModel.onBackButtonClickListener()
+            return
+        }
+
         if (viewModel is GoalDetailViewModel){
             viewModel.onBackButtonClickListener()
             return
