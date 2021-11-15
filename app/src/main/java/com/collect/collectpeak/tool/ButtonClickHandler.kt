@@ -129,7 +129,7 @@ class ButtonClickHandler<T>(private val viewModel:T) {
         }
 
         if (viewModel is NoticeViewModel){
-
+            viewModel.onBackButtonClickListener()
             return
         }
 

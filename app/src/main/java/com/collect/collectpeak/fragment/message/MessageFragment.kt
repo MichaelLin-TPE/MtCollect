@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
 import com.collect.collectpeak.databinding.FragmentMessageBinding
+import com.collect.collectpeak.fragment.chat.ChatFragment
 import com.collect.collectpeak.tool.ButtonClickHandler
+import com.collect.collectpeak.tool.FragmentUtil
 
 
 class MessageFragment : MtCollectorFragment() {
@@ -64,8 +66,8 @@ class MessageFragment : MtCollectorFragment() {
             adapter.setData(it)
             dataBinding.messageRecyclerView.adapter = adapter
 
-            adapter.setOnMessageListItemClickListener{
-
+            adapter.setOnMessageListItemClickListener{ data->
+                viewModel.onMessageItemClickListener(data)
             }
         })
     }
@@ -103,6 +105,10 @@ class MessageFragment : MtCollectorFragment() {
 
             override fun onShowToast(content: String) {
                 showToast(content)
+            }
+
+            override fun goToChatPage(chatId: String) {
+                FragmentUtil.replace(R.id.container,fragmentActivity.supportFragmentManager,ChatFragment.newInstance(chatId),true,ChatFragment.javaClass.simpleName,1)
             }
         })
 

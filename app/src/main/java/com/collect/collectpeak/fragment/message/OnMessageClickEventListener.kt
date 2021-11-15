@@ -5,4 +5,6 @@ interface OnMessageClickEventListener {
     fun onBackPress()
 
     fun onShowToast(content:String)
+
+    fun goToChatPage(chatId: String)
 }

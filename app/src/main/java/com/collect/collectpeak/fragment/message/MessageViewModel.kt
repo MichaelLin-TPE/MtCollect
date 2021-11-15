@@ -48,6 +48,10 @@ class MessageViewModel : ViewModel() {
         })
     }
 
+    fun onMessageItemClickListener(data: MessageListData) {
+        onMessageClickEventListener.goToChatPage(data.chatRoomId)
+    }
+
 
     open class MessageFactory : ViewModelProvider.NewInstanceFactory(){
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
