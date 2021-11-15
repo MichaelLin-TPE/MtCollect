@@ -119,6 +119,10 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
         onHomeClickEventListener.onGotoNotificationPage()
     }
 
+    fun onMessageClickListener() {
+        onHomeClickEventListener.onGoToMessagePage()
+    }
+
 
     open class HomeViewModelFactory(private val homeRepository: HomeRepository) : ViewModelProvider.NewInstanceFactory(){
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {

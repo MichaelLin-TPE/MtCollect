@@ -31,9 +31,10 @@ class NoticeViewModel : ViewModel() {
     fun onFragmentResume() {
         FireStoreHandler.getInstance().getUserNotificationByUid(AuthHandler.getCurrentUser()?.uid,object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<NoticeData>>{
             override fun onCatchDataSuccess(data: ArrayList<NoticeData>) {
+                noticeArray.clear()
                 showDefaultView.value = false
                 showNotificationView.value = true
-                data.reverse()
+
                 showNotificationListView.value = data
 
                 noticeArray.addAll(data)
@@ -63,8 +64,30 @@ class NoticeViewModel : ViewModel() {
     }
 
     fun onApplyFriendAcceptListener(data: NoticeData) {
+        FireStoreHandler.getInstance().clearApplyData(data)
+
+        noticeArray.forEach {
+            if (it.fromWho == data.fromWho && it.timeStamp == data.timeStamp && it.type == data.type){
+                it.type = NoticeType.REQUEST_FRIEND_ACCEPT
+                return@forEach
+            }
+        }
+        val uid = AuthHandler.getCurrentUser()?.uid ?: return
+
+        FireStoreHandler.getInstance().updateNoticeDataByUid(uid,noticeArray)
 
 
+        //be friend
+        val friendUid = data.fromWho
+        val myUid = AuthHandler.getCurrentUser()?.uid.toString()
+
+        FireStoreHandler.getInstance().addFriendByMyUid(friendUid)
+
+        FireStoreHandler.getInstance().addFriendByOtherUid(friendUid,myUid)
+
+        FireStoreHandler.getInstance().editBasicDataToAddFriendCountByUid(friendUid)
+
+        FireStoreHandler.getInstance().editBasicDataToAddFriendCountByUid(myUid)
 
     }
 

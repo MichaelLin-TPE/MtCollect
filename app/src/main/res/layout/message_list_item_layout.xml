@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message_root"
+    android:background="@drawable/message_list_itme_click_shape"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/message_photo"
+        app:riv_oval="true"
+        android:src="@drawable/hiking_logo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:scaleType="centerCrop"
+        android:layout_width="50dp"
+        android:visibility="visible"
+        android:layout_height="50dp"/>
+
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        android:id="@+id/message_name"
+        app:layout_constraintTop_toTopOf="@id/message_photo"
+        app:layout_constraintLeft_toRightOf="@id/message_photo"
+        android:layout_marginStart="16dp"
+        tools:text="Michael"
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <com.collect.collectpeak.custom_widget.CollectPeakTextView
+        android:id="@+id/message_msg"
+        app:layout_constraintBottom_toBottomOf="@id/message_photo"
+        app:layout_constraintLeft_toRightOf="@id/message_photo"
+        android:layout_marginStart="16dp"
+        tools:text="Michael"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <View
+        app:layout_constraintTop_toBottomOf="@id/message_photo"
+        app:layout_constraintLeft_toLeftOf="@id/message_photo"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="16dp"
+        android:background="@color/white"
+        android:layout_width="0dp"
+        android:layout_height="1dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

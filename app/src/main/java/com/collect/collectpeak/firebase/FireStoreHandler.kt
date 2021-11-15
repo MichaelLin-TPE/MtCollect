@@ -7,6 +7,7 @@ import com.collect.collectpeak.fragment.equipment.equipment_select.*
 import com.collect.collectpeak.fragment.member.MemberBasicData
 import com.collect.collectpeak.fragment.member.MemberData
 import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditData
+import com.collect.collectpeak.fragment.message.MessageListData
 import com.collect.collectpeak.fragment.mountain.peak_preview.SummitData
 import com.collect.collectpeak.fragment.notice.NoticeData
 import com.collect.collectpeak.fragment.notice.NoticeType.Companion.REQUEST_FRIEND
@@ -2094,7 +2095,7 @@ class FireStoreHandler {
         firestore.collection(CHAT_DATA).document(targetChatId).set(map, SetOptions.merge())
     }
 
-    fun sendNotification(targetUid: String , data : NoticeData) {
+    fun sendNotification(targetUid: String, data: NoticeData) {
 
         firestore.collection(NOTIFICATION)
             .document(targetUid)
@@ -2112,7 +2113,7 @@ class FireStoreHandler {
                     MichaelLog.i("沒有通知 snapshot is null")
                     val array = ArrayList<NoticeData>()
                     array.add(data)
-                    saveNoticeData(targetUid,array)
+                    saveNoticeData(targetUid, array)
 
                     return@addOnCompleteListener
                 }
@@ -2128,22 +2129,22 @@ class FireStoreHandler {
                     MichaelLog.i("沒有通知 data is null")
                     val array = ArrayList<NoticeData>()
                     array.add(data)
-                    saveNoticeData(targetUid,array)
+                    saveNoticeData(targetUid, array)
 
                     return@addOnCompleteListener
                 }
 
                 noticeArray.add(data)
-                saveNoticeData(targetUid,noticeArray)
+                saveNoticeData(targetUid, noticeArray)
 
 
             }
 
     }
 
-    private fun saveNoticeData(targetUid: String,noticeArray : ArrayList<NoticeData>){
+    private fun saveNoticeData(targetUid: String, noticeArray: ArrayList<NoticeData>) {
 
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(noticeArray)
         firestore.collection(NOTIFICATION)
             .document(targetUid)
@@ -2156,7 +2157,7 @@ class FireStoreHandler {
         uid: String?,
         onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<NoticeData>>
     ) {
-        if (uid == null){
+        if (uid == null) {
             return
         }
         val documentReference = firestore.collection(NOTIFICATION).document(uid)
@@ -2194,7 +2195,7 @@ class FireStoreHandler {
     }
 
     fun saveUserNotificationByUid(uid: String, data: java.util.ArrayList<NoticeData>) {
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(data)
         firestore.collection(NOTIFICATION)
             .document(uid)
@@ -2229,8 +2230,8 @@ class FireStoreHandler {
                     return@addOnCompleteListener
                 }
 
-                for (apply in applyArray){
-                    if (apply.fromWho == data.fromWho && apply.toWho == AuthHandler.getCurrentUser()?.uid){
+                for (apply in applyArray) {
+                    if (apply.fromWho == data.fromWho && apply.toWho == AuthHandler.getCurrentUser()?.uid) {
                         applyArray.remove(apply)
                         break
                     }
@@ -2241,12 +2242,259 @@ class FireStoreHandler {
 
     fun updateNoticeDataByUid(uid: String, noticeArray: java.util.ArrayList<NoticeData>) {
 
-        val map = HashMap<String,String>()
+        val map = HashMap<String, String>()
         map["json"] = Gson().toJson(noticeArray)
 
         firestore.collection(NOTIFICATION)
             .document(uid)
             .set(map, SetOptions.merge())
+    }
+
+    fun addFriendByMyUid(friendUid: String) {
+        firestore.collection(FRIEND_LIST)
+            .document(friendUid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful && task.result == null) {
+
+                    val friendList = ArrayList<FriendData>()
+                    val data = FriendData()
+                    data.uid = friendUid
+                    friendList.add(data)
+                    addFriend(friendList, AuthHandler.getCurrentUser()?.uid.toString())
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+
+                    MichaelLog.i("沒有朋友 snapshot is null")
+                    val friendList = ArrayList<FriendData>()
+                    val data = FriendData()
+                    data.uid = friendUid
+                    friendList.add(data)
+                    addFriend(friendList, AuthHandler.getCurrentUser()?.uid.toString())
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val friendArray = Gson().fromJson<ArrayList<FriendData>>(
+                    json,
+                    object : TypeToken<ArrayList<FriendData>>() {}.type
+                )
+                if (friendArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有朋友 data is null")
+                    val friendList = ArrayList<FriendData>()
+                    val data = FriendData()
+                    data.uid = friendUid
+                    friendList.add(data)
+                    addFriend(friendList, AuthHandler.getCurrentUser()?.uid.toString())
+
+                    return@addOnCompleteListener
+                }
+                val data = FriendData()
+                data.uid = friendUid
+                friendArray.add(data)
+                addFriend(friendArray, AuthHandler.getCurrentUser()?.uid.toString())
+            }
+    }
+
+    private fun addFriend(friendList: java.util.ArrayList<FriendData>, uid: String) {
+        val map = HashMap<String, String>()
+        map["json"] = Gson().toJson(friendList)
+        firestore.collection(FRIEND_LIST)
+            .document(uid)
+            .set(map, SetOptions.merge())
+    }
+
+    fun addFriendByOtherUid(otherUid: String, myUid: String) {
+        firestore.collection(FRIEND_LIST)
+            .document(otherUid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful && task.result == null) {
+
+                    val friendList = ArrayList<FriendData>()
+                    val data = FriendData()
+                    data.uid = myUid
+                    friendList.add(data)
+                    addFriend(friendList, otherUid)
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+
+                    MichaelLog.i("沒有朋友 snapshot is null")
+                    val friendList = ArrayList<FriendData>()
+                    val data = FriendData()
+                    data.uid = myUid
+                    friendList.add(data)
+                    addFriend(friendList, otherUid)
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val friendArray = Gson().fromJson<ArrayList<FriendData>>(
+                    json,
+                    object : TypeToken<ArrayList<FriendData>>() {}.type
+                )
+                if (friendArray.isNullOrEmpty()) {
+
+                    MichaelLog.i("沒有朋友 data is null")
+                    val friendList = ArrayList<FriendData>()
+                    val data = FriendData()
+                    data.uid = myUid
+                    friendList.add(data)
+                    addFriend(friendList, otherUid)
+
+                    return@addOnCompleteListener
+                }
+                val data = FriendData()
+                data.uid = myUid
+                friendArray.add(data)
+                addFriend(friendArray, otherUid)
+            }
+    }
+
+    fun editBasicDataToAddFriendCountByUid(uid: String) {
+        firestore.collection(USER_BASIC_INFO)
+            .document(uid)
+            .get()
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful || task.result == null) {
+
+                    MichaelLog.i("取得使用者基本資料失敗")
+
+                    return@addOnCompleteListener
+                }
+                val snapshot = task.result
+
+                if (snapshot == null || snapshot.data == null) {
+                    MichaelLog.i("取得使用者基本資料失敗：snapshot")
+                    return@addOnCompleteListener
+                }
+
+                val json = snapshot.data?.get("json") as String
+
+                val basicData = Gson().fromJson(json, MemberBasicData::class.java)
+                    ?: return@addOnCompleteListener
+
+                basicData.friendCount = basicData.friendCount + 1
+
+                saveBasicData(basicData, uid)
+
+            }
+    }
+
+    private fun saveBasicData(basicData: MemberBasicData, uid: String) {
+
+        val map = HashMap<String, String>()
+        map["json"] = Gson().toJson(basicData)
+
+        firestore.collection(USER_BASIC_INFO)
+            .document(uid)
+            .set(map, SetOptions.merge())
+
+    }
+
+    fun getMessageList(onFireStoreCatchDataListener: OnFireStoreCatchDataListener<java.util.ArrayList<MessageListData>>) {
+        firestore.collection(CHAT_DATA)
+            .get()
+            .addOnCompleteListener {
+
+                val messageList = ArrayList<MessageListData>()
+
+                val snapshot = it.result
+
+                if (snapshot == null) {
+                    onFireStoreCatchDataListener.onCatchDataFail()
+                    return@addOnCompleteListener
+                }
+
+                for (doc in snapshot.documents) {
+                    MichaelLog.i("id : ${doc.id}")
+                    val data = MessageListData()
+                    data.chatRoomId = doc.id
+                    data.uid = doc.id.replace(AuthHandler.getCurrentUser()?.uid.toString(), "")
+                    messageList.add(data)
+                }
+
+                onFireStoreCatchDataListener.onCatchDataSuccess(messageList)
+
+
+            }
+
+
+    }
+
+    private val messageList = ArrayList<MessageListData>()
+
+    private lateinit var onCatchMessageListListener: OnFireStoreCatchDataListener<ArrayList<MessageListData>>
+
+    private var messageCount = 0
+    fun getLastMessage(
+        data: ArrayList<MessageListData>,
+        onFireStoreCatchDataListener: FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<MessageListData>>
+    ) {
+        this.onCatchMessageListListener = onFireStoreCatchDataListener
+        this.messageList.clear()
+        this.messageList.addAll(data)
+
+        startToCatchLastMessage()
+    }
+
+    private fun startToCatchLastMessage() {
+
+        if (messageCount < messageList.size){
+
+            val documentReference = firestore.collection(CHAT_DATA).document(messageList[messageCount].chatRoomId)
+
+            documentReference.addSnapshotListener { value, error ->
+
+                if (error != null) {
+                    MichaelLog.i("錯誤 無法取的使用者資料")
+                    onCatchMessageListListener.onCatchDataFail()
+                    return@addSnapshotListener
+                }
+
+                if (value != null && value.exists()) {
+
+                    val json = value.get("json") as String
+
+                    allMessageArray = Gson().fromJson<ArrayList<MessageData>>(
+                        json,
+                        object : TypeToken<ArrayList<MessageData>>() {}.type
+                    )
+
+                    if (allMessageArray.isNullOrEmpty()) {
+                        MichaelLog.i("無聊天資料")
+                        onCatchMessageListListener.onCatchDataFail()
+                        return@addSnapshotListener
+                    }
+
+                    val lastMessage = allMessageArray[allMessageArray.size - 1].message
+                    MichaelLog.i("lastMessage : $lastMessage")
+                    messageList[messageCount].lastMessage = lastMessage
+                    messageCount ++
+                    startToCatchLastMessage()
+
+                } else {
+                    onCatchMessageListListener.onCatchDataFail()
+                    MichaelLog.i("無聊天資料")
+                }
+            }
+
+
+        }else{
+            messageCount = 0
+            onCatchMessageListListener.onCatchDataSuccess(messageList)
+        }
+
+
     }
 
     interface OnCheckUserExistResultListener {

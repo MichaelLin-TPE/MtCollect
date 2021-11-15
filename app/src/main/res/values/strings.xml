@@ -112,4 +112,5 @@
     <string name="title_send">傳送</string>
     <string name="title_notice">通知</string>
     <string name="title_no_notification">目前無任何通知</string>
+    <string name="title_message_manage">訊息管理</string>
 </resources>

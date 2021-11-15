@@ -65,6 +65,7 @@ class NoticeFragment : Fragment() {
             if (isShowed){
                 adapter.setData(it)
                 adapter.notifyDataSetChanged()
+                dataBinding.noticeRecyclerView.scrollToPosition(it.size - 1)
                 return@observe
             }
 
@@ -72,6 +73,7 @@ class NoticeFragment : Fragment() {
 
             dataBinding.noticeRecyclerView.adapter = adapter
             isShowed = true
+            dataBinding.noticeRecyclerView.scrollToPosition(it.size - 1)
 
             adapter.setOnNoticeItemClickListener(object : NoticeAdapter.OnNoticeItemClickListener{
                 override fun onApplyFriendAccept(data: NoticeData) {

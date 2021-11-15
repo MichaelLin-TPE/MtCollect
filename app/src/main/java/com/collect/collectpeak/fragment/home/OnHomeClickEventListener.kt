@@ -7,4 +7,6 @@ interface OnHomeClickEventListener {
     fun onStopNoticeAnimation()
 
     fun onGotoNotificationPage()
+
+    fun onGoToMessagePage()
 }

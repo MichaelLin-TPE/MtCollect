@@ -17,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.collect.collectpeak.MtCollectorFragment
 import com.collect.collectpeak.R
+import com.collect.collectpeak.activity.MessageActivity
 import com.collect.collectpeak.activity.NoticeActivity
 import com.collect.collectpeak.databinding.FragmentHomeBinding
 import com.collect.collectpeak.dialog.LocationListDialog
@@ -112,8 +113,15 @@ class HomeFragment : MtCollectorFragment() {
                 Tool.startActivityInAnim(fragmentActivity,1)
             }
 
+            override fun onGoToMessagePage() {
+                val intent = Intent(fragmentActivity,MessageActivity::class.java)
+                fragmentActivity.startActivity(intent)
+                Tool.startActivityInAnim(fragmentActivity,1)
+            }
+
         })
     }
+
 
     private fun stopNoticeAnimation() {
         handler.removeCallbacks(rotate45)

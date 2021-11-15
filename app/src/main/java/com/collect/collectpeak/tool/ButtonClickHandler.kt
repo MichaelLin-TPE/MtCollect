@@ -9,6 +9,7 @@ import com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDet
 import com.collect.collectpeak.fragment.member.page_fragment.goal_edit.GoalEditViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.post_detail.PostDetailViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.post_edit.PostEditViewModel
+import com.collect.collectpeak.fragment.message.MessageViewModel
 import com.collect.collectpeak.fragment.mountain.mt_list.MtViewModel
 import com.collect.collectpeak.fragment.notice.NoticeViewModel
 import com.collect.collectpeak.fragment.user_page.UserPageViewModel
@@ -18,6 +19,15 @@ import com.collect.collectpeak.fragment.user_page.UserPageViewModel
  */
 
 class ButtonClickHandler<T>(private val viewModel:T) {
+
+    /**
+     * 點擊 HOME 訊息
+     */
+    fun onMessageClickListener(view: View){
+        if (viewModel is HomeViewModel){
+            viewModel.onMessageClickListener()
+        }
+    }
 
     /**
      * 點擊HOME通知
@@ -113,8 +123,13 @@ class ButtonClickHandler<T>(private val viewModel:T) {
      */
     fun onBackButtonClickListener(view: View){
 
-        if (viewModel is NoticeViewModel){
+        if (viewModel is MessageViewModel){
             viewModel.onBackButtonClickListener()
+            return
+        }
+
+        if (viewModel is NoticeViewModel){
+
             return
         }
 
