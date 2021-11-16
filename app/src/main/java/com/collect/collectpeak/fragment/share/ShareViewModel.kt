@@ -12,7 +12,13 @@ class ShareViewModel(private val repository: ShareRepository) : ViewModel() {
     val postListLiveData = MutableLiveData<ArrayList<ShareData>>()
 
     val updatePostListLiveData = MutableLiveData<ArrayList<ShareData>>()
-    
+
+    val showDefaultViewLiveData = MutableLiveData(true)
+
+    val showPostViewLiveData = MutableLiveData(false)
+
+    val defaultContent = MutableLiveData("目前無任何貼文。")
+
     private val allPostData = ArrayList<ShareData>()
 
     private lateinit var onShareClickEventListener: OnShareClickEventListener
@@ -22,13 +28,27 @@ class ShareViewModel(private val repository: ShareRepository) : ViewModel() {
     }
 
     fun onFragmentResume() {
+
+        if (!AuthHandler.isLogin()){
+            showDefaultViewLiveData.value = true
+            showPostViewLiveData.value = false
+            defaultContent.value = "您尚未登入唷。"
+
+            return
+        }
+
+
         FireStoreHandler.getInstance().getUserPostData(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<ShareData>>{
             override fun onCatchDataSuccess(data: ArrayList<ShareData>) {
+                showDefaultViewLiveData.value = false
+                showPostViewLiveData.value = true
                 allPostData.addAll(data)
                 postListLiveData.value = data
             }
 
             override fun onCatchDataFail() {
+                showDefaultViewLiveData.value = true
+                showPostViewLiveData.value = false
                MichaelLog.i("無法取得 post data")
             }
 

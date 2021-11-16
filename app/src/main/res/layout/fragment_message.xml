@@ -2,6 +2,7 @@
 
 <layout>
     <data>
+        <import type="android.view.View"/>
         <variable
             name="clickListener"
             type="com.collect.collectpeak.tool.ButtonClickHandler" />
@@ -52,8 +53,44 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/notice_default_view"
+            android:visibility="@{vm.showDefaultView ? View.VISIBLE : View.GONE}"
+            app:layout_constraintTop_toBottomOf="@id/action_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/notice_default_icon"
+                android:src="@drawable/message_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:contentDescription="@null"
+                android:layout_width="80dp"
+                android:layout_height="80dp"/>
+
+            <com.collect.collectpeak.custom_widget.CollectPeakTextView
+                android:id="@+id/notice_default_title"
+                app:layout_constraintTop_toBottomOf="@id/notice_default_icon"
+                app:layout_constraintLeft_toLeftOf="@id/notice_default_icon"
+                app:layout_constraintRight_toRightOf="@id/notice_default_icon"
+                android:layout_marginTop="16dp"
+                android:text="@{vm.defaultContentLiveData}"
+                android:textSize="25sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/message_recycler_view"
+            android:visibility="@{vm.showMessageView ? View.VISIBLE : View.GONE}"
             app:layout_constraintTop_toBottomOf="@id/action_bar"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="match_parent"

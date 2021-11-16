@@ -16,6 +16,8 @@ class NoticeViewModel : ViewModel() {
 
     val showNotificationView = MutableLiveData(false)
 
+    val defaultContentLiveData = MutableLiveData("目前無任何通知")
+
     val showNotificationListView = MutableLiveData<ArrayList<NoticeData>>()
 
     private val noticeArray = ArrayList<NoticeData>()
@@ -29,6 +31,15 @@ class NoticeViewModel : ViewModel() {
     }
 
     fun onFragmentResume() {
+
+        if (!AuthHandler.isLogin()){
+
+            showDefaultView.value = true
+            showNotificationView.value = false
+            defaultContentLiveData.value = "您尚未登入唷。"
+            return
+        }
+
         FireStoreHandler.getInstance().getUserNotificationByUid(AuthHandler.getCurrentUser()?.uid,object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<NoticeData>>{
             override fun onCatchDataSuccess(data: ArrayList<NoticeData>) {
                 noticeArray.clear()

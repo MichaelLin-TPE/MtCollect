@@ -85,7 +85,7 @@
                 app:layout_constraintLeft_toLeftOf="@id/notice_default_icon"
                 app:layout_constraintRight_toRightOf="@id/notice_default_icon"
                 android:layout_marginTop="16dp"
-                android:text="@string/title_no_notification"
+                android:text="@{vm.defaultContentLiveData}"
                 android:textSize="25sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
