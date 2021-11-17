@@ -40,6 +40,7 @@ class ShareViewModel(private val repository: ShareRepository) : ViewModel() {
 
         FireStoreHandler.getInstance().getUserPostData(object : FireStoreHandler.OnFireStoreCatchDataListener<ArrayList<ShareData>>{
             override fun onCatchDataSuccess(data: ArrayList<ShareData>) {
+                allPostData.clear()
                 showDefaultViewLiveData.value = false
                 showPostViewLiveData.value = true
                 allPostData.addAll(data)
