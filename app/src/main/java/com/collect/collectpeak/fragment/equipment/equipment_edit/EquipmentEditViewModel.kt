@@ -15,19 +15,13 @@ class EquipmentEditViewModel(private val repository: EquipmentEditRepository) : 
 
     val equipmentListLiveData = MutableLiveData<ArrayList<EquipmentData>>()
 
-    val showEditNameDialogLiveData = MutableLiveData<Boolean>()
-
-    val goToEditEquipmentListPageLiveData = MutableLiveData<Boolean>()
-
-    val showToastLiveData = MutableLiveData<String>()
-
-    val finishPageLiveData = MutableLiveData<Boolean>()
-
-    val showProgressLiveData = MutableLiveData<Boolean>()
-
-    val dismissProgressDialog = MutableLiveData<Boolean>()
-
     private lateinit var targetUserData : EquipmentUserData
+
+    private lateinit var onEquipmentEditClickEventListener: OnEquipmentEditClickEventListener
+
+    fun  setOnEquipmentEditClickEventListener(onEquipmentEditClickEventListener: OnEquipmentEditClickEventListener){
+        this.onEquipmentEditClickEventListener = onEquipmentEditClickEventListener
+    }
 
     fun onFragmentResume(userEquipmentData: EquipmentUserData) {
 
@@ -50,7 +44,7 @@ class EquipmentEditViewModel(private val repository: EquipmentEditRepository) : 
 
     fun editNameButtonClickListener() {
 
-        showEditNameDialogLiveData.value = true
+        onEquipmentEditClickEventListener.onShowEditNameDialog()
 
     }
 
@@ -62,21 +56,21 @@ class EquipmentEditViewModel(private val repository: EquipmentEditRepository) : 
     fun editEquipmentListClickListener() {
 
         TempDataHandler.setUserEquipmentList(targetUserData.selectTargetArray)
-        goToEditEquipmentListPageLiveData.value = true
+        onEquipmentEditClickEventListener.onGoToEditEquipmentListPage()
 
     }
 
     fun onButtonDoneClickListener() {
-        showProgressLiveData.value = true
+        onEquipmentEditClickEventListener.onShowProgress("處理中")
         repository.saveUserEquipmentData(targetUserData,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
             override fun onCatchDataSuccess(data: Unit) {
-                finishPageLiveData.value = true
-                dismissProgressDialog.value = true
+                onEquipmentEditClickEventListener.onDismissProgressDialog()
+                onEquipmentEditClickEventListener.onFinishPage()
             }
 
             override fun onCatchDataFail() {
-                showToastLiveData.value = "不明錯誤，請稍後再試。"
-                dismissProgressDialog.value = true
+                onEquipmentEditClickEventListener.onDismissProgressDialog()
+                onEquipmentEditClickEventListener.onShowToast("發生不知名錯誤，請稍後再試。")
             }
 
         })

@@ -77,84 +77,49 @@ class EquipmentEditFragment : MtCollectorFragment() {
 
         })
 
-        viewModel.showEditNameDialogLiveData.observe(this, {
-
-            if (!it) {
-                return@observe
+        viewModel.setOnEquipmentEditClickEventListener(object : OnEquipmentEditClickEventListener{
+            override fun onShowProgress(content: String) {
+                showProgressDialog(fragmentActivity.supportFragmentManager,content)
             }
-            showEditContentDialog(
-                fragmentActivity.supportFragmentManager,
-                "輸入裝備清單名稱",
-                object : EditContentDialog.OnEditContentDialogClickListener {
-                    override fun onConfirm(content: String) {
-                        viewModel.onCatchEquipmentListName(content)
-                    }
 
-                    override fun onCancel() {
-
-                    }
-                })
-
-
-        })
-
-        viewModel.showToastLiveData.observe(this,{
-            if (it.isEmpty()){
-                return@observe
+            override fun onDismissProgressDialog() {
+                dismissProgressDialog()
             }
-            showToast(it)
-        })
 
-
-        viewModel.goToEditEquipmentListPageLiveData.observe(this, {
-            if (!it) {
-                return@observe
+            override fun onShowToast(content: String) {
+                showToast(content)
             }
-            val fragment = EquipmentFragment.newInstance(EDIT_LIST)
-            FragmentUtil.replace(R.id.container,fragmentActivity.supportFragmentManager,fragment,true,fragment.javaClass.simpleName,ANIM_LEFT_RIGHT)
 
-        })
-
-        viewModel.finishPageLiveData.observe(this,{
-
-            if (!it){
-                return@observe
+            override fun onFinishPage() {
+                finishPage()
             }
-            finishPage()
 
-        })
+            override fun onShowEditNameDialog() {
+                showEditContentDialog(
+                    fragmentActivity.supportFragmentManager,
+                    "輸入裝備清單名稱",
+                    object : EditContentDialog.OnEditContentDialogClickListener {
+                        override fun onConfirm(content: String) {
+                            viewModel.onCatchEquipmentListName(content)
+                        }
 
-        viewModel.showProgressLiveData.observe(this,{
-            if (!it){
-                return@observe
+                        override fun onCancel() {
+
+                        }
+                    })
             }
-            showProgressDialog(fragmentActivity.supportFragmentManager,fragmentActivity.getString(R.string.title_editing))
-        })
 
-        viewModel.dismissProgressDialog.observe(this,{
-            if (!it){
-                return@observe
+            override fun onGoToEditEquipmentListPage() {
+                val fragment = EquipmentFragment.newInstance(EDIT_LIST)
+                FragmentUtil.replace(R.id.container,fragmentActivity.supportFragmentManager,fragment,true,fragment.javaClass.simpleName,ANIM_LEFT_RIGHT)
+
             }
-            dismissProgressDialog()
+
         })
 
     }
 
-    override fun onPause() {
-        super.onPause()
 
-        viewModel.showEditNameDialogLiveData.value = false
-
-        viewModel.goToEditEquipmentListPageLiveData.value = false
-
-        viewModel.showToastLiveData.value = ""
-
-        viewModel.finishPageLiveData.value = false
-
-        viewModel.showProgressLiveData.value = false
-
-        viewModel.dismissProgressDialog.value = false
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

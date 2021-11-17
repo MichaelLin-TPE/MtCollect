@@ -22,17 +22,11 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
 
     val progressBarLiveData = MutableLiveData(View.VISIBLE)
 
-    val loadingDialogLiveData = MutableLiveData<Boolean>()
-
-    val dismissLoadingDialogLiveData = MutableLiveData<Boolean>()
-
-    val finishPageLiveData = MutableLiveData<Boolean>()
-
-    val finishButtonEnable = MutableLiveData<Boolean>()
-
-    val toastLiveData = MutableLiveData<String>()
+    val finishButtonEnable = MutableLiveData(false)
 
     val showEditNameLiveData = MutableLiveData<Int>()
+
+    private lateinit var onEquipmentSelectClickEventListener: OnEquipmentSelectClickEventListener
 
     private lateinit var selectEquipmentArray : ArrayList<EquipmentData>
 
@@ -44,6 +38,10 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
         )
     }"
 
+    fun setOnEquipmentSelectClickEventListener(onEquipmentSelectClickEventListener: OnEquipmentSelectClickEventListener){
+        this.onEquipmentSelectClickEventListener = onEquipmentSelectClickEventListener
+    }
+
     private var type = 0
 
     fun onFragmentStart(type: Int) {
@@ -51,14 +49,6 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
         this.type = type
 
         selectEquipmentArray = ArrayList()
-
-        loadingDialogLiveData.value = false
-
-        dismissLoadingDialogLiveData.value = false;
-
-        finishPageLiveData.value = false;
-
-        finishButtonEnable.value = false
 
         FireStoreHandler.getInstance().getCurrentUserEquipmentData()
 
@@ -199,36 +189,38 @@ class EquipmentViewModel(private val equipmentRepository: EquipmentRepository) :
         this.equipmentListTitle = equipmentListTitle
     }
 
-    fun onButtonDoneClickListener() {
+    fun onBackButtonClickListener() {
+        MichaelLog.i("點擊離開頁面")
+        onEquipmentSelectClickEventListener.onFinishPage()
+    }
 
+    fun onEquipmentSelectFinishClickListener() {
+
+        MichaelLog.i("點擊 完成按鈕")
 
         if (type == EDIT_LIST){
 
             TempDataHandler.setUserEquipmentList(selectEquipmentArray)
-            finishPageLiveData.value = true
+            onEquipmentSelectClickEventListener.onFinishPage()
 
             return
         }
 
-
-        loadingDialogLiveData.value = true
+        onEquipmentSelectClickEventListener.onShowProgress("新增中")
 
         //等有使用者了這邊才會開始做
         FireStoreHandler.getInstance().addEquipmentData(selectEquipmentArray,equipmentListTitle,object : FireStoreHandler.OnFireStoreCatchDataListener<Unit>{
             override fun onCatchDataSuccess(data: Unit) {
-                dismissLoadingDialogLiveData.value = true
-                finishPageLiveData.value = true
+                onEquipmentSelectClickEventListener.onDismissProgressDialog()
+                onEquipmentSelectClickEventListener.onFinishPage()
             }
 
             override fun onCatchDataFail() {
-                dismissLoadingDialogLiveData.value = true;
-                toastLiveData.value = "錯誤，請重新再試一次。"
+                onEquipmentSelectClickEventListener.onDismissProgressDialog()
+                onEquipmentSelectClickEventListener.onShowToast("錯誤，請重新再試一次。")
             }
 
         })
-
-
-
     }
 
 

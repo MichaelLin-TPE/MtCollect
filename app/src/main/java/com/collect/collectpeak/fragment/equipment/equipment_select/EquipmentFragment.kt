@@ -17,10 +17,7 @@ import com.collect.collectpeak.activity.EquipmentActivity.Companion.SELECT
 import com.collect.collectpeak.databinding.FragmentEquipmentBinding
 import com.collect.collectpeak.fragment.equipment.equipment_edit.EquipmentEditFragment
 import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentNewAdapter.Companion.TITLE
-import com.collect.collectpeak.tool.FragmentUtil
-import com.collect.collectpeak.tool.HeaderItemDecoration
-import com.collect.collectpeak.tool.TimeTool
-import com.collect.collectpeak.tool.Tool
+import com.collect.collectpeak.tool.*
 
 class EquipmentFragment : MtCollectorFragment() {
 
@@ -70,7 +67,7 @@ class EquipmentFragment : MtCollectorFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_equipment, container, false)
         dataBinding.vm = viewModel
         dataBinding.lifecycleOwner = this
-
+        dataBinding.clickListener = ButtonClickHandler(viewModel)
         initView(dataBinding.root)
 
         return dataBinding.root
@@ -88,10 +85,6 @@ class EquipmentFragment : MtCollectorFragment() {
         })
 
 
-        dataBinding.btnBack.setOnClickListener {
-            finishPage()
-        }
-
         dataBinding.equipmentEditName.hint = TimeTool.getCurrentDate() + " ${fragmentActivity.getString(R.string.equipment_select_list)}"
 
         dataBinding.equipmentEditName.addTextChangedListener(object : TextWatcher{
@@ -108,10 +101,6 @@ class EquipmentFragment : MtCollectorFragment() {
             }
 
         })
-
-        dataBinding.mtActionBarDone.setOnClickListener {
-            viewModel.onButtonDoneClickListener()
-        }
 
 
     }
@@ -147,33 +136,23 @@ class EquipmentFragment : MtCollectorFragment() {
 
         })
 
-        viewModel.finishButtonEnable.observe(this,{
-            dataBinding.mtActionBarDone.isEnabled = it
-        })
 
-        viewModel.loadingDialogLiveData.observe(this,{
-            if (!it){
-                return@observe
+        viewModel.setOnEquipmentSelectClickEventListener(object : OnEquipmentSelectClickEventListener{
+            override fun onShowProgress(content: String) {
+                showProgressDialog(fragmentActivity.supportFragmentManager,content)
             }
-            showProgressDialog(fragmentActivity.supportFragmentManager,"新增中")
-        })
 
-        viewModel.dismissLoadingDialogLiveData.observe(this,{
-            if (!it){
-                return@observe
+            override fun onDismissProgressDialog() {
+                dismissProgressDialog()
             }
-            dismissProgressDialog()
-        })
 
-        viewModel.toastLiveData.observe(this,{
-            showToast(it)
-        })
-
-        viewModel.finishPageLiveData.observe(this,{
-            if (!it){
-                return@observe
+            override fun onShowToast(content: String) {
+                showToast(content)
             }
-            finishPage()
+
+            override fun onFinishPage() {
+                finishPage()
+            }
 
         })
 
@@ -187,7 +166,7 @@ class EquipmentFragment : MtCollectorFragment() {
             return
         }
 
-        FragmentUtil.popBackStackTo(fragmentActivity.supportFragmentManager,EquipmentEditFragment.javaClass.simpleName)
+        fragmentActivity.supportFragmentManager.popBackStack()
 
 
 

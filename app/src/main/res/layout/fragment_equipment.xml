@@ -4,6 +4,9 @@
 <layout>
     <data>
         <variable
+            name="clickListener"
+            type="com.collect.collectpeak.tool.ButtonClickHandler" />
+        <variable
             name="vm"
             type="com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentViewModel" />
     </data>
@@ -27,6 +30,7 @@
             <ImageView
                 android:id="@+id/btn_back"
                 android:src="@drawable/back"
+                android:onClick="@{(v)->clickListener.onBackButtonClickListener(v)}"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -52,6 +56,8 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                android:enabled="@{vm.finishButtonEnable}"
+                android:onClick="@{(v)->clickListener.onEquipmentSelectFinishClickListener(v)}"
                 android:layout_marginEnd="16dp"
                 android:textSize="25sp"
                 android:text="@string/done"

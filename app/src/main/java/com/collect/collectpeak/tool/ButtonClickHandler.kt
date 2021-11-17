@@ -3,6 +3,7 @@ package com.collect.collectpeak.tool
 import android.view.View
 import com.collect.collectpeak.fragment.chat.ChatViewModel
 import com.collect.collectpeak.fragment.equipment.EquipmentListViewModel
+import com.collect.collectpeak.fragment.equipment.equipment_select.EquipmentViewModel
 import com.collect.collectpeak.fragment.home.HomeViewModel
 import com.collect.collectpeak.fragment.member.MemberViewModel
 import com.collect.collectpeak.fragment.member.page_fragment.goal_detail.GoalDetailViewModel
@@ -19,6 +20,17 @@ import com.collect.collectpeak.fragment.user_page.UserPageViewModel
  */
 
 class ButtonClickHandler<T>(private val viewModel:T) {
+
+    /**
+     * 點擊 裝備清單選擇完成
+     */
+    fun onEquipmentSelectFinishClickListener(view: View){
+        if (viewModel is EquipmentViewModel){
+            viewModel.onEquipmentSelectFinishClickListener()
+        }
+    }
+
+
 
     /**
      * 點擊 HOME 訊息
@@ -122,6 +134,11 @@ class ButtonClickHandler<T>(private val viewModel:T) {
      * 所有的 BackButtonClickListener 都會使用這個方法
      */
     fun onBackButtonClickListener(view: View){
+
+        if(viewModel is EquipmentViewModel){
+            viewModel.onBackButtonClickListener()
+            return
+        }
 
         if (viewModel is MessageViewModel){
             viewModel.onBackButtonClickListener()
