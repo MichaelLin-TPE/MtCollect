@@ -7,7 +7,7 @@
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/chat_photo"
         app:riv_oval="true"
-        android:src="@drawable/hiking_logo"
+        android:src="@mipmap/ic_launcher"
         app:layout_constraintTop_toTopOf="@id/chat_right_text"
         app:layout_constraintBottom_toBottomOf="@id/chat_right_text"
         app:layout_constraintLeft_toLeftOf="parent"

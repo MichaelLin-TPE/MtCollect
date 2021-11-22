@@ -10,7 +10,7 @@
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/member_photo"
         app:riv_oval="true"
-        android:src="@drawable/hiking_logo"
+        android:src="@mipmap/ic_launcher"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="32dp"

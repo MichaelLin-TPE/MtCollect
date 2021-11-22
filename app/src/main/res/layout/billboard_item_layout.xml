@@ -30,7 +30,7 @@
 
     <ImageView
         android:id="@+id/billboard_icon"
-        android:src="@drawable/hiking_logo"
+        android:src="@mipmap/ic_launcher"
         app:layout_constraintTop_toBottomOf="@id/billboard_title"
         app:layout_constraintLeft_toLeftOf="@id/billboard_title"
         android:layout_marginTop="200dp"

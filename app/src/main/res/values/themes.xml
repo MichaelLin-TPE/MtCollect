@@ -19,7 +19,7 @@
     <!--    快速開啟ＡＰＰ-->
     <style name="SplashTheme" parent="Base.Theme.NoActionBar">
         <item name="android:windowIsTranslucent">false</item>
-        <item name="android:windowBackground">@drawable/launch_photo</item>
+        <item name="android:windowBackground">@drawable/launch_logo</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
